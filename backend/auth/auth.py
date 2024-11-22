@@ -8,7 +8,10 @@ from ..config import config
 SECRET = config['Miscellaneous']['Secret']
 TOKEN_EXPIRE = config.get("Miscellaneous", "token_expire")
 
-cookie_transport = CookieTransport(cookie_max_age=TOKEN_EXPIRE)
+cookie_transport = CookieTransport(
+    cookie_max_age=TOKEN_EXPIRE,
+    cookie_secure=False
+)
 
 def get_jwt_strategy() -> JWTStrategy:
     return JWTStrategy(secret=SECRET, lifetime_seconds=TOKEN_EXPIRE)
