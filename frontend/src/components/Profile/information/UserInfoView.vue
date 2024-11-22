@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center justify-center">
+  <div class="flex flex-col items-center justify-center">
     <div>
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -16,7 +16,7 @@
         />
       </svg>
     </div>
-    <div class="flex-col">
+    <div class="flex flex-col">
       <p class="text-center text-[4rem]">{{ name }}</p>
       <p class="text-center text-3xl">{{ email }}</p>
     </div>
