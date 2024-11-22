@@ -5,5 +5,7 @@ import ProfileView from '@/components/profile/ProfileView.vue'
 
 <template>
   <Navbar />
-  <ProfileView />
+  <div class="max-w-screen-xl mx-auto h-screen grid grid-rows-layout">
+    <ProfileView />
+  </div>
 </template>
