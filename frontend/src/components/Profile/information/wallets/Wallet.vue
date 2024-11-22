@@ -6,14 +6,9 @@ defineProps({
 })
 </script>
 
-<template>
-  <div>  
-<button class="mx-auto rounded-lg bg-white shadow w-full max-w-80">
-  <div class="p-4">
+<template> 
+  <a href="#" class=" bg-gray-100 p-4 block mx-auto hover:bg-yellow-300 active:bg-yellow-400 rounded-lg shadow w-full h-full max-w-80">
     <h3 class="text-xl font-medium text-gray-900">{{ Naming }}</h3>
     <p class="mt-1 text-gray-500"> {{ countOfMoney }} {{ banknote }}</p>
-  </div>
-</button>
-
-  </div>
+  </a>
 </template>

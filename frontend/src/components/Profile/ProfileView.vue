@@ -5,11 +5,11 @@ import WalletsView from '@/components/profile/information/wallets/WalletsView.vu
 </script>
 
 <template>
-  <div class="flex flex-col">
+  <div class=" bg-slight-gray flex flex-col px-5">
       <UserInfoView/>
-    <div class="flex items-center gap-5">
-      <MoneyView class="w-2/3"/>
-      <WalletsView class="w-1/3"/>
+    <div class="flex flex-col sm:flex-col md:flex-row lg:flex-row items-center justify-center gap-5">
+      <MoneyView class="lg:w-2/3 w-full"/>
+      <WalletsView class="lg:w-1/3 w-full"/>
     </div>  
   </div>
 </template>
