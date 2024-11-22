@@ -51,10 +51,18 @@ def create_token(data: dict, expires_delta: timedelta | None = None):
     encoded_jwt = jwt.encode(to_encode, SECRET, algorithm=ALGORITHM)
     return encoded_jwt
 
-@router.post("/change_email/get_token")
+@router.post(
+    "/change_email/get_token",
+    responses= {
+        200: {"detail": "OK"}
+    }
+)
 async def set_new_email(email_data: ChangeEmail, user_info = Depends(current_user), request = Request):
     if len(email_data.new_email) < 6 or len(email_data.new_email) > 255:
         return {"detail": "Email length is invalid"}
+    
+    if email_data.new_email == user_info.email:
+        return {"detail": "This email is already in use"}
     
     token = create_token(
         {
