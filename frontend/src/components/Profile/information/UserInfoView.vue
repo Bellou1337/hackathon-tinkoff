@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center justify-center">
+  <div class="flex items-center justify-left m-5">
     <div>
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -19,6 +19,7 @@
     <div class="flex flex-col">
       <p class="text-center text-[4rem]">{{ name }}</p>
       <p class="text-center text-3xl">{{ email }}</p>
+      <a class="text-center underline text-gray-500" href="#"> Хотите сменить пароль?</a>
     </div>
   </div>
 </template>
