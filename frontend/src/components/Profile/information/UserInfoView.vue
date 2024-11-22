@@ -1,9 +1,9 @@
 <template>
-  <div class="flex items-center justify-left m-5">
+  <div class="flex text-center gap-5 justify-left m-5 h-auto">
     <div>
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        class="w-40 h-40"
+        class="lg:w-40 lg:h-40 w-20 h-20"
         fill="none"
         viewBox="0 0 24 24"
         stroke-width="1.5"
@@ -16,10 +16,10 @@
         />
       </svg>
     </div>
-    <div class="flex flex-col">
-      <p class="text-center text-[4rem]">{{ name }}</p>
-      <p class="text-center text-3xl">{{ email }}</p>
-      <a class="text-center underline text-gray-500" href="#"> Хотите сменить пароль?</a>
+    <div>
+      <p class="text-center text-3xl lg:text-[4rem] ">{{ name }}</p>
+      <p class="text-center text-xl lg:text-3xl">{{ email }}</p>
+      <a class="text-center text-sm lg:text-base underline text-gray-500" href="#"> Хотите сменить пароль?</a>
     </div>
   </div>
 </template>
