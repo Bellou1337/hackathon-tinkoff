@@ -48,3 +48,14 @@ class ChangeEmail(BaseModel):
 
 class ChangeEmailData(BaseModel):
     detail: str
+
+
+class NewCategory(BaseModel):
+    name: str
+    is_income: bool
+
+class DeleteCategory(BaseModel):
+    id: int
+
+class ResponseDetail(BaseModel):
+    detail: str

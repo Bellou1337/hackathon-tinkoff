@@ -3,7 +3,7 @@ venv
 __pycache__
 script.py.mako
 .vscode/PythonImportHelper-v2-Completion.json
-.todo
+todo.txt
 config.ini
 README.md
 alembic.ini
