@@ -23,4 +23,10 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import {ref} from 'vue'
+
+const name = ref('Username');
+const email = ref('asdasd@mail.ru');
+
+</script>
