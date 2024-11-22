@@ -9,6 +9,7 @@
               <p class="mx-5 text-3xl lg:text-7xl">{{ costs }}</p>
           </div>
       </div>
+    </div>
 
       <!--Income-->
       <div class="w-full">
@@ -19,13 +20,13 @@
               <p class="mx-5 text-3xl lg:text-7xl">{{ incomes }}</p>
           </div>
       </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-  import {ref} from 'vue'
+import { ref } from 'vue'
 
-  const costs = ref('1500');
-  const incomes = ref('2000')
-
+const costs = ref('1500')
+const incomes = ref('2000')
 </script>

@@ -28,7 +28,7 @@ export default {
           />
         </svg>
 
-        <a class="text-xl font-semibold transition hover:text-blue-500/75" href="#">Weather App</a>
+        <a class="text-xl font-semibold transition hover:text-blue-500/75" href="#">asdasd</a>
       </div>
 
       <div class="flex flex-1 items-center justify-end">
