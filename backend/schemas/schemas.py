@@ -52,3 +52,9 @@ class UpdateCategory(BaseModel):
 
 class ResponseDetail(BaseModel):
     detail: str
+
+class NewTransaction(BaseModel):
+    title: str
+    category_id: int
+    amount: float
+    date: datetime

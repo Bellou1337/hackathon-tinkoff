@@ -1,4 +1,4 @@
-from sqlalchemy import MetaData, Table, Integer, Column, String, TIMESTAMP,ARRAY, Boolean, CheckConstraint, Float
+from sqlalchemy import MetaData, Table, Integer, Column, String, TIMESTAMP,ARRAY, Boolean, CheckConstraint, Float, ForeignKey
 from datetime import datetime
 
 meta_data = MetaData()
@@ -33,11 +33,10 @@ transaction = Table(
     "transaction",
     meta_data,
     Column("id", Integer, primary_key=True),
-    Column("category_id", ARRAY(Integer), default=[]),
+    Column("category_id", Integer, ForeignKey("category.id"), nullable=False),
     Column("title", String, nullable=False),
     Column("amount", Float, nullable=False),
-    Column("registered_at", TIMESTAMP, nullable=False, default=datetime.utcnow),
-    
+    Column("date", TIMESTAMP, nullable=False, default=datetime.utcnow),   
 )
 
 category = Table(
