@@ -25,9 +25,8 @@
 </template>
 
 <script setup>
-import {ref} from 'vue'
+import { ref } from 'vue'
 
-const name = ref('Username');
-const email = ref('asdasd@mail.ru');
-
+const name = ref('Username')
+const email = ref('asdasd@mail.ru')
 </script>

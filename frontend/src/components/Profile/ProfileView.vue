@@ -5,7 +5,7 @@ import WalletsView from '@/components/profile/information/wallets/WalletsView.vu
 </script>
 
 <template>
-    <UserInfoView />
-    <MoneyView />
-    <WalletsView />
+  <UserInfoView />
+  <MoneyView />
+  <WalletsView />
 </template>
