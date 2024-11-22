@@ -4,8 +4,6 @@ __pycache__
 script.py.mako
 .vscode/PythonImportHelper-v2-Completion.json
 .todo
-alembic
-alembic.ini
 config.ini
 README.md
 .env
