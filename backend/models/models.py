@@ -12,6 +12,11 @@ user = Table(
     Column("username", String, nullable = False),
     Column("wallet_ids", ARRAY(Integer), default=[]),
     Column("registered_at", TIMESTAMP, default=datetime.utcnow),  
+
+    Column("is_active", Boolean, default=True, nullable=False),
+    Column("is_superuser", Boolean, default=False, nullable=False),
+    Column("is_verified", Boolean, default=False, nullable=False),
+    CheckConstraint("LENGTH(email) >=6 AND LENGTH(email) <=255", name = "email_length_check")
 )
 
 wallet = Table(

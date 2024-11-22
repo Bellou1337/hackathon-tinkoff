@@ -9,11 +9,17 @@ class UserRead(schemas.BaseUser[int]):
     id: int
     username: str
     email: EmailStr
-    wallet_ids: list[int]
+    wallet_ids: List[int] = []
     
-    is_active: bool = True
+    is_active: bool = False
     is_superuser: bool = False
     is_verified: bool = False
+
+    @classmethod
+    def model_validate(cls, data):
+        if data.wallet_ids is None:
+            data.wallet_ids = []
+        return super().model_validate(data)
 
 
 class UserReadAll(UserRead):
@@ -25,7 +31,7 @@ class UserCreate(schemas.BaseUserCreate):
     username: str
     password: str
 
-    is_active: Optional[bool] = True
+    is_active: Optional[bool] = False
     is_superuser: Optional[bool] = False
     is_verified: Optional[bool] = False
 
