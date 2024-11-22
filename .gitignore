@@ -6,6 +6,7 @@ script.py.mako
 .todo
 config.ini
 README.md
+alembic.ini
 .env
 celerybeat-schedule.bak
 celerybeat-schedule.dat

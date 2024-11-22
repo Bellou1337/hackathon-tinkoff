@@ -9,10 +9,7 @@ from ..schemas import ChangeEmailData
 from ..dependencies import current_user
 from typing import Dict
 
-router = APIRouter(
-    prefix="/db",
-    tags=["database"]
-)
+router = APIRouter()
 
 
 @router.post("/change_email", response_model=ChangeEmailData)
