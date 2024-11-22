@@ -8,5 +8,14 @@ config = Configure(default_config={
         "DB_USER": "",
         "DB_PASS": "",
     },
+    "SMTP": {
+        "server": "smtp.mail.ru",
+        "port": 587,
+        "email": "",
+        "password": ""
+    },
+    "Miscellaneous": {
+        "Secret": "",
+        "token_expire": 3600
+    }
 })
-
