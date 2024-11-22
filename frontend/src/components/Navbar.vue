@@ -35,6 +35,13 @@ export default {
         <div class="flex items-center gap-4">
           <div class="hidden sm:flex sm:gap-4">
             <router-link
+              class="block rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium text-blue-600 transition hover:text-blue-600/75"
+              to="/auth/register"
+            >
+              Профиль
+            </router-link>
+
+            <router-link
               class="block rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
               to="/auth/login"
             >
