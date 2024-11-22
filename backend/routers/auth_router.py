@@ -1,19 +1,21 @@
 from ..auth.auth import SECRET
 from ..auth import auth_backend, fastapi_users
-from ..schemas import UserCreate, UserRead, UserUpdate, ChangeEmailData, ChangeEmail
+from ..schemas import UserCreate, UserRead, UserUpdate, ResponseDetail
 from ..dependencies import current_user
 from ..database import get_async_session
 from ..models import user
 from ..auth.manager import smtp_sender
 from ..general_data import templates
+from ..details import *
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import update, select
-from fastapi import APIRouter, HTTPException, APIRouter, Depends, status, Body, Request, Query
+from fastapi import APIRouter, HTTPException, APIRouter, Depends, status, Body, Request
 import jwt
 from jwt.exceptions import InvalidTokenError
 from datetime import datetime, timedelta, timezone
+from typing import Optional
 
 router = APIRouter()
 
@@ -54,20 +56,39 @@ def create_token(data: dict, expires_delta: timedelta | None = None):
 @router.post(
     "/change_email/get_token",
     responses= {
-        200: {"detail": "OK"}
+        200: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": OK}
+                }
+            }
+        },
+        400: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": "error name"}
+                }
+            }
+        },
     }
 )
-async def set_new_email(email_data: ChangeEmail, user_info = Depends(current_user), request = Request):
-    if len(email_data.new_email) < 6 or len(email_data.new_email) > 255:
-        return {"detail": "Email length is invalid"}
+async def set_new_email(new_email: str = Body(embed=True, examples=["user@example.com"]), user_info = Depends(current_user), request = Optional[Request]):
+    if len(new_email) < 6 or len(new_email) > 255:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=EMAIL_LENGTH_IS_INVALID
+        )
     
-    if email_data.new_email == user_info.email:
-        return {"detail": "This email is already in use"}
+    if new_email == user_info.email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=THIS_EMAIL_IS_ALREADY_IN_USE
+        )
     
     token = create_token(
         {
             "sub": user_info.id,
-            "email": email_data.new_email,
+            "email": new_email,
             "email_verified": user_info.email
         },
         timedelta(days=1)
@@ -80,13 +101,31 @@ async def set_new_email(email_data: ChangeEmail, user_info = Depends(current_use
             }
     )
 
-    smtp_sender.send_HTML_mail(email_data.new_email, "Смена почты", html.body.decode())
+    smtp_sender.send_HTML_mail(new_email, "Смена почты", html.body.decode())
 
-    return {"detail": "OK"}
+    return {"detail": OK}
     
 
 
-@router.post("/change_email/use_token", response_model=ChangeEmailData)
+@router.post(
+    "/change_email/use_token",
+    responses= {
+        200: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": OK}
+                }
+            }
+        },
+        400: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": "error name"}
+                }
+            }
+        },
+    }
+)
 async def set_new_email(token: str = Body(embed=True), session: AsyncSession = Depends(get_async_session)):
     try:
         payload = jwt.decode(token, SECRET, algorithms=[ALGORITHM])
@@ -108,24 +147,24 @@ async def set_new_email(token: str = Body(embed=True), session: AsyncSession = D
         await session.execute(stmt)
         await session.commit()
 
-        return {"detail": "Email update"}
+        return {"detail": OK}
     except InvalidTokenError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid Token"
+            detail=INVALID_TOKEN
         )
     except IntegrityError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email length is invalid"
+            detail=EMAIL_LENGTH_IS_INVALID
         )
     except HTTPException:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
+            detail=USER_NOT_FOUND
         )
     except Exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="server error something with the data"
+            detail=SERVER_ERROR_SOMETHING_WITH_THE_DATA
         )

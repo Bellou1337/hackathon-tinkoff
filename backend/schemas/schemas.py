@@ -38,24 +38,17 @@ class UserCreate(schemas.BaseUserCreate):
 class UserUpdate(schemas.BaseUserUpdate):
     pass
 
-
-class NewEmail(BaseModel):
-    pass
-
-class ChangeEmail(BaseModel):
-    new_email: str
-
-
-class ChangeEmailData(BaseModel):
-    detail: str
-
-
 class NewCategory(BaseModel):
     name: str
     is_income: bool
 
-class DeleteCategory(BaseModel):
+class ReadCategory(NewCategory):
     id: int
+
+class UpdateCategory(BaseModel):
+    id: int
+    name: str | None = None
+    is_income: bool | None = None
 
 class ResponseDetail(BaseModel):
     detail: str

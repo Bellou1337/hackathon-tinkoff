@@ -1,6 +1,8 @@
 from fastapi import FastAPI, Depends
 
-from .routers import auth_router, db_router
+from .routers import wallet
+
+from .routers import auth_router
 
 
 app = FastAPI(
@@ -14,9 +16,9 @@ app.include_router(
 )
 
 app.include_router(
-    db_router.router,
-    prefix="/db",
-    tags=["database"]
+    wallet.router,
+    prefix="/wallet",
+    tags=["wallet"]
 )
 
 @app.get('/')
