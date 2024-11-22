@@ -1,24 +1,46 @@
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 export default {
   setup() {
-    const password = ref('')
+    const firstPassword = ref('')
+    const secondPassword = ref('')
     const isPasswordVisible = ref(false)
+    const errorMessage = ref('')
 
     const togglePasswordVisibility = () => {
       isPasswordVisible.value = !isPasswordVisible.value
     }
 
     const shouldShowPasswordToggle = computed(() => {
-      password.value.length > 0
+      return firstPassword.value.length > 0
+    })
+
+    const handleSubmit = (event) => {
+      event.preventDefault()
+
+      if (firstPassword.value !== secondPassword.value) {
+        errorMessage.value = 'Пароли не совпадают'
+      } else {
+        errorMessage.value = ''
+      }
+    }
+
+    watch([firstPassword, secondPassword], (newValues) => {
+      const [newFirstPassword, newSecondPassword] = newValues
+      if (newFirstPassword.length === 0 || newSecondPassword.length === 0) {
+        errorMessage.value = ''
+      }
     })
 
     return {
-      password,
+      firstPassword,
+      secondPassword,
       isPasswordVisible,
       togglePasswordVisibility,
       shouldShowPasswordToggle,
+      errorMessage,
+      handleSubmit,
     }
   },
 }
@@ -26,33 +48,48 @@ export default {
 
 <template>
   <section class="relative flex flex-wrap lg:h-screen lg:items-center">
-    <div class="w-full px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
+    <div
+      class="max-w-screen-sm mx-auto w-full bg-white rounded-2xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-24"
+    >
       <div class="mx-auto max-w-xl text-center">
-        <h1 class="text-2xl font-bold sm:text-3xl">Начните смотреть погоду сегодня!</h1>
-
-        <p class="mt-4 text-gray-500">
-          Войдите в аккаунт, чтобы получить доступ к погоде в любом месте и в любое время.
-        </p>
+        <h1 class="text-auth-g text-2xl font-bold sm:text-3xl">Регистрация</h1>
       </div>
 
-      <form action="#" class="mx-auto mb-0 mt-8 max-w-md space-y-4">
+      <form @submit="handleSubmit" class="mx-auto mb-0 mt-8 max-w-md space-y-4">
+        <!-- Ввод имени пользователя -->
         <div>
           <div class="relative">
             <input
-              type="email"
-              class="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm transition hover:bg-gray-100"
-              placeholder="Введите почту"
+              type="username"
+              class="w-full rounded-lg border-gray-200 bg-gray-100 p-4 pe-12 text-sm shadow-sm transition hover:bg-gray-200"
+              placeholder="Введите имя пользователя"
+              required
             />
           </div>
         </div>
 
+        <!-- Ввод почты -->
         <div>
           <div class="relative">
             <input
-              v-model="password"
+              type="email"
+              class="w-full rounded-lg border-gray-200 bg-gray-100 p-4 pe-12 text-sm shadow-sm transition hover:bg-gray-200"
+              placeholder="Введите почту"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Ввод пароля -->
+        <div>
+          <div class="relative">
+            <input
+              v-model="firstPassword"
               :type="isPasswordVisible ? 'text' : 'password'"
-              class="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm transition hover:bg-gray-100"
+              :class="{ 'bg-red-100 border-red-200 hover:bg-red-200': errorMessage }"
+              class="w-full rounded-lg border-gray-200 bg-gray-100 p-4 pe-12 text-sm shadow-sm transition hover:bg-gray-200"
               placeholder="Введите пароль"
+              required
             />
 
             <span class="absolute inset-y-0 end-0 grid place-content-center px-4">
@@ -60,8 +97,8 @@ export default {
                 v-show="shouldShowPasswordToggle"
                 @click="togglePasswordVisibility"
                 xmlns="http://www.w3.org/2000/svg"
-                :class="{ 'text-gray-700 hover:text-gray-800': isPasswordVisible }"
-                class="size-4 text-gray-400 transition hover:text-gray-500"
+                :class="{ 'text-gray-700 hover:text-gray-800': errorMessage }"
+                class="size-4 text-gray-400 transition hover:text-gray-500 cursor-pointer"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -83,17 +120,37 @@ export default {
           </div>
         </div>
 
+        <!-- Подтверждения пароля -->
+        <div>
+          <div class="relative">
+            <input
+              v-model="secondPassword"
+              type="password"
+              :class="{ 'bg-red-100 border-red-200 hover:bg-red-200': errorMessage }"
+              class="w-full rounded-lg border-gray-200 bg-gray-100 p-4 pe-12 text-sm shadow-sm transition hover:bg-gray-200"
+              placeholder="Подтвердите пароль"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Сообщение об ошибке -->
+        <p v-show="errorMessage" class="text-red-500 text-sm">
+          {{ errorMessage }}
+        </p>
+
+        <!-- Кнопка отправки формы и ссылки -->
         <div class="flex items-center justify-between">
           <p class="text-sm text-gray-500">
-            Нет аккаунта?
-            <router-link class="underline" to="/auth/register">Регистрация</router-link>
+            Есть аккаунт?
+            <router-link class="underline" to="/auth/login">Вход</router-link>
           </p>
 
           <button
             type="submit"
-            class="inline-block rounded-lg bg-blue-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-blue-700"
+            class="inline-block rounded-lg bg-yellow-300 px-5 py-3 text-sm font-medium transition hover:bg-yellow-400"
           >
-            Вход
+            Войти
           </button>
         </div>
       </form>

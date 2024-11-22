@@ -6,6 +6,10 @@ export default {
       fontFamily: {
         sans: ['Geologica', 'sans-serif'],
       },
+      colors: {
+        'slight-gray': '#f6f7f8',
+        'auth-gray': '#757373',
+      },
     },
   },
   plugins: [],
