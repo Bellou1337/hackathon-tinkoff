@@ -1,7 +1,6 @@
 # Backend
 venv
 __pycache__
-script.py.mako
 .vscode/PythonImportHelper-v2-Completion.json
 .todo
 config.ini
@@ -11,6 +10,7 @@ alembic.ini
 celerybeat-schedule.bak
 celerybeat-schedule.dat
 celerybeat-schedule.dir
+todo.txt
 
 # Frontend
 logs
