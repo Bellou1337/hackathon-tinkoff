@@ -81,21 +81,21 @@ export default {
                 role="menu"
               >
                 <div class="p-2">
-                  <a
-                    href="#"
+                  <router-link
+                    to="/auth/login"
                     class="block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                     role="menuitem"
                   >
                     Войти
-                  </a>
+                  </router-link>
 
-                  <a
-                    href="#"
+                  <router-link
+                    to="/auth/register"
                     class="block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                     role="menuitem"
                   >
                     Создать аккаунт
-                  </a>
+                  </router-link>
                 </div>
               </div>
             </transition>
