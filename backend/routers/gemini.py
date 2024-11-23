@@ -117,12 +117,11 @@ async def get_recomendation(gemini_data: GetGeminiRecomendation, session: AsyncS
     if not (await check_ownership_wallet(gemini_data.wallet_id, user.id, session)) and not user.is_superuser:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=USER_PERMISSION_ERROR)
 
-    key = f"tinkoffhack{gemini_data.wallet_id}"
+    key = f"tinkoffhack.{gemini_data.wallet_id}"
     stmt = redis_db.get(key)
     
     if stmt is not None:
         return {"detail" : stmt.decode('utf-8')}
-    
     
     raise HTTPException(
             status_code = status.HTTP_404_NOT_FOUND,
