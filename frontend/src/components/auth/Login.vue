@@ -1,78 +1,139 @@
 <script>
 import { ref, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import apiClient from '@/services'
+import { getCookie } from '@/utils/cookies'
 
 export default {
   setup() {
-    const firstPassword = ref('')
-    const secondPassword = ref('')
+    const email = ref('')
+    const password = ref('')
     const isPasswordVisible = ref(false)
     const errorMessage = ref('')
+
+    const router = useRouter()
 
     const togglePasswordVisibility = () => {
       isPasswordVisible.value = !isPasswordVisible.value
     }
 
     const shouldShowPasswordToggle = computed(() => {
-      return firstPassword.value.length > 0
+      return password.value.length > 0
     })
 
-    const handleSubmit = (event) => {
+    const MessageTypeEnum = {
+      NONE: 'NONE',
+      LOGIN_FAILED: 'LOGIN_FAILED',
+      LOGIN_SUCCESS: 'LOGIN_SUCCESS',
+    }
+
+    const messageType = ref(MessageTypeEnum.ERROR)
+    const message = ref('')
+
+    const handleSubmit = async (event) => {
       event.preventDefault()
 
-      if (firstPassword.value !== secondPassword.value) {
-        errorMessage.value = 'Пароли не совпадают'
-      } else {
-        errorMessage.value = ''
+      try {
+        const token = await getCookie('auth_token')
+
+        if (token) {
+          messageType.value = MessageTypeEnum.LOGIN_FAILED
+          message.value = response.data.message || 'Пользователь уже авторизован'
+          return
+        }
+
+        const response = await apiClient.post(
+          '/auth/jwt/login',
+          new URLSearchParams({
+            username: email.value,
+            password: password.value,
+          }),
+          {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+          }
+        )
+
+        console.log(response)
+
+        if (response.status === 200) {
+          messageType.value = MessageTypeEnum.LOGIN_SUCCESS
+          message.value = 'Авторизация прошла успешно!'
+          console.log('Авторизация прошла успешно!')
+
+          if (!token) {
+            document.cookie = `auth_token=${response.data.token}; path=/;`
+            return
+          }
+        } else {
+          messageType.value = MessageTypeEnum.LOGIN_FAILED
+          message.value = response.data.message || 'Неверный логин или пароль!'
+        }
+        console.log('Авторизация успешна:', response.data)
+
+        // setTimeout(() => {
+        //   router.push('/')
+        // }, 1500)
+      } catch (error) {
+        messageType.value = MessageTypeEnum.LOGIN_FAILED
+        message.value = 'Неверный логин или пароль!'
+
+        if (error.response) {
+          console.error('Ошибка авторизации:', error.response.data)
+        } else if (error.request) {
+          console.error('Нет ответа от сервера:', error.request)
+        } else {
+          console.error('Ошибка:', error.message)
+        }
       }
     }
 
-    watch([firstPassword, secondPassword], (newValues) => {
-      const [newFirstPassword, newSecondPassword] = newValues
-      if (newFirstPassword.length === 0 || newSecondPassword.length === 0) {
-        errorMessage.value = ''
+    watch([password, email], (newValues) => {
+      const [newPassword, newEmail] = newValues
+
+      if (newPassword.length === 0 || newEmail.length === 0) {
+        messageType.value = MessageTypeEnum.NONE
+        message.value = ''
       }
     })
 
     return {
-      firstPassword,
-      secondPassword,
+      email,
+      password,
       isPasswordVisible,
       togglePasswordVisibility,
       shouldShowPasswordToggle,
       errorMessage,
       handleSubmit,
+      messageType,
+      message,
+      MessageTypeEnum,
     }
   },
 }
 </script>
 
 <template>
-  <section class="relative flex flex-wrap lg:h-screen lg:items-center">
+  <section class="relative flex items-center justify-center min-h-screen px-4">
     <div
       class="max-w-screen-sm mx-auto w-full bg-white rounded-2xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-24"
     >
       <div class="mx-auto max-w-xl text-center">
-        <h1 class="text-auth-g text-2xl font-bold sm:text-3xl">Регистрация</h1>
+        <h1 class="text-auth-g text-2xl font-bold sm:text-3xl">Авторизация</h1>
       </div>
 
       <form @submit="handleSubmit" class="mx-auto mb-0 mt-8 max-w-md space-y-4">
-        <!-- Ввод имени пользователя -->
-        <div>
-          <div class="relative">
-            <input
-              type="username"
-              class="w-full rounded-lg border-gray-200 bg-gray-100 p-4 pe-12 text-sm shadow-sm transition hover:bg-gray-200"
-              placeholder="Введите имя пользователя"
-              required
-            />
-          </div>
-        </div>
-
         <!-- Ввод почты -->
         <div>
           <div class="relative">
             <input
+              v-model="email"
               type="email"
+              :class="{
+                'bg-red-100 border-red-200 hover:bg-red-200':
+                  messageType === MessageTypeEnum.LOGIN_FAILED,
+              }"
               class="w-full rounded-lg border-gray-200 bg-gray-100 p-4 pe-12 text-sm shadow-sm transition hover:bg-gray-200"
               placeholder="Введите почту"
               required
@@ -84,9 +145,12 @@ export default {
         <div>
           <div class="relative">
             <input
-              v-model="firstPassword"
+              v-model="password"
               :type="isPasswordVisible ? 'text' : 'password'"
-              :class="{ 'bg-red-100 border-red-200 hover:bg-red-200': errorMessage }"
+              :class="{
+                'bg-red-100 border-red-200 hover:bg-red-200':
+                  messageType === MessageTypeEnum.LOGIN_FAILED,
+              }"
               class="w-full rounded-lg border-gray-200 bg-gray-100 p-4 pe-12 text-sm shadow-sm transition hover:bg-gray-200"
               placeholder="Введите пароль"
               required
@@ -120,30 +184,23 @@ export default {
           </div>
         </div>
 
-        <!-- Подтверждения пароля -->
-        <div>
-          <div class="relative">
-            <input
-              v-model="secondPassword"
-              type="password"
-              :class="{ 'bg-red-100 border-red-200 hover:bg-red-200': errorMessage }"
-              class="w-full rounded-lg border-gray-200 bg-gray-100 p-4 pe-12 text-sm shadow-sm transition hover:bg-gray-200"
-              placeholder="Подтвердите пароль"
-              required
-            />
-          </div>
-        </div>
-
-        <!-- Сообщение об ошибке -->
-        <p v-show="errorMessage" class="text-red-500 text-sm">
-          {{ errorMessage }}
+        <!-- Сообщение об ошибке/успехе -->
+        <p
+          v-if="messageType !== MessageTypeEnum.NONE"
+          :class="{
+            'text-green-500': messageType === MessageTypeEnum.LOGIN_SUCCESS,
+            'text-red-500': messageType === MessageTypeEnum.LOGIN_FAILED,
+          }"
+          class="text-sm"
+        >
+          {{ message }}
         </p>
 
         <!-- Кнопка отправки формы и ссылки -->
         <div class="flex items-center justify-between">
           <p class="text-sm text-gray-500">
-            Есть аккаунт?
-            <router-link class="underline" to="/auth/login">Вход</router-link>
+            Нет аккаунта?
+            <router-link class="underline" to="/auth/register">Регистрация</router-link>
           </p>
 
           <button
