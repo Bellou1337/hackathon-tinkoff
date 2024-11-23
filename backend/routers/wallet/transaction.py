@@ -5,10 +5,12 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import update, select, insert, delete
 from ...database import get_async_session
 from ...models import transaction, category, wallet
-from ...schemas import NewTransaction, ResponseDetail, UpdateTransaction, GetTransaction, ReadTransaction
+from ...schemas import NewTransaction, ResponseDetail, UpdateTransaction, GetTransaction, ReadTransaction, UserRead
 from ...dependencies import current_user
 from typing import Dict
 from ...details import *
+from .wallet import check_ownership_wallet
+from ...dependencies import current_user, current_superuser
 
 transaction_router = APIRouter(
     prefix = "/transaction",
@@ -39,9 +41,14 @@ transaction_router = APIRouter(
 )
 async def add_new_transaction(
         transaction_data: NewTransaction, 
-        session: AsyncSession = Depends(get_async_session)
+        session: AsyncSession = Depends(get_async_session),
+        user: UserRead = Depends(current_user)
     ):
     try:
+
+        if not (await check_ownership_wallet(transaction_data.wallet_id, user.id, session)) and not user.is_superuser:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=USER_PERMISSION_ERROR)
+
         query = insert(transaction).values(
             title = transaction_data.title,
             amount = transaction_data.amount,
@@ -101,7 +108,8 @@ async def add_new_transaction(
 )
 async def remove_transaction(
         transaction_id: int = Body(embed=True),
-        session: AsyncSession = Depends(get_async_session)
+        session: AsyncSession = Depends(get_async_session),
+        user: UserRead = Depends(current_user)
     ): 
     
     query = select(transaction).where(transaction.c.id == transaction_id)
@@ -112,6 +120,9 @@ async def remove_transaction(
             status_code = status.HTTP_400_BAD_REQUEST,
             detail = TRANSACTION_NOT_FOUND
         )
+    
+    if not (await check_ownership_wallet(transaction_data[1], user.id, session)) and not user.is_superuser:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=USER_PERMISSION_ERROR)
 
     query = select(category).where(category.c.id == transaction_data[2])
     category_data = (await session.execute(query)).fetchone()
@@ -156,8 +167,13 @@ async def remove_transaction(
 )
 async def get_transaction_by_date(
         get_transaction_data: GetTransaction,
-        session: AsyncSession = Depends(get_async_session)
+        session: AsyncSession = Depends(get_async_session),
+        user: UserRead = Depends(current_user)
     ):
+
+    if not (await check_ownership_wallet(get_transaction_data.wallet_id, user.id, session)) and not user.is_superuser:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=USER_PERMISSION_ERROR)
+
     res = await transaction_by_date(get_transaction_data, session)
     return res
     
@@ -165,31 +181,23 @@ async def get_transaction_by_date(
 async def transaction_by_date(
     get_transaction_data: GetTransaction,
     session: AsyncSession = Depends(get_async_session)
-):
+):        
+    stmt = select(transaction).where(transaction.c.wallet_id == get_transaction_data.wallet_id, transaction.c.date.between(get_transaction_data.start.replace(tzinfo=None), get_transaction_data.end.replace(tzinfo=None)))
     
-    try:
-        stmt = select(transaction).where(transaction.c.wallet_id == get_transaction_data.wallet_id, transaction.c.date.between(get_transaction_data.start.replace(tzinfo=None), get_transaction_data.end.replace(tzinfo=None)))
-        
-        data = (await session.execute(stmt)).all()
-        res: list[ReadTransaction] = []
-        
-        for item in data:
-            res.append(ReadTransaction(
-                id=item[0],
-                title=item[3],
-                category_id=item[2],
-                wallet_id=item[1],
-                amount=item[4],
-                date=item[5]
-            ))
+    data = (await session.execute(stmt)).all()
+    res: list[ReadTransaction] = []
+    
+    for item in data:
+        res.append(ReadTransaction(
+            id=item[0],
+            title=item[3],
+            category_id=item[2],
+            wallet_id=item[1],
+            amount=item[4],
+            date=item[5]
+        ))
 
-        return res
-    
-    except Exception:
-        raise HTTPException(
-            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail = SERVER_ERROR_SOMETHING_WITH_THE_DATA
-        )
+    return res
 
 
 @transaction_router.post(
@@ -208,7 +216,8 @@ async def transaction_by_date(
 )
 async def get_transaction_by_id(
         transaction_id: int = Body(embed=True),
-        session: AsyncSession = Depends(get_async_session)
+        session: AsyncSession = Depends(get_async_session),
+        user: UserRead = Depends(current_user)
     ):
     
     stmt = select(transaction).where(transaction.c.id == transaction_id)
@@ -220,6 +229,9 @@ async def get_transaction_by_id(
             status_code = status.HTTP_400_BAD_REQUEST,
             detail = TRANSACTION_NOT_FOUND
         )
+    
+    if not (await check_ownership_wallet(item[1], user.id, session)) and not user.is_superuser:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=USER_PERMISSION_ERROR)
     
     return ReadTransaction(
             id=item[0],
@@ -238,8 +250,12 @@ async def get_transaction_by_id(
 )
 async def get_transaction_by_wallet_id(
         wallet_id: int = Body(embed=True),
-        session: AsyncSession = Depends(get_async_session)
+        session: AsyncSession = Depends(get_async_session),
+        user: UserRead = Depends(current_user)
     ):
+
+    if not (await check_ownership_wallet(wallet_id, user.id, session)) and not user.is_superuser:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=USER_PERMISSION_ERROR)
     
     stmt = select(transaction).where(transaction.c.wallet_id == wallet_id)
     
@@ -264,7 +280,8 @@ async def get_transaction_by_wallet_id(
 )
 async def update_transaction(
         trasaction_data: UpdateTransaction = Body(embed=True),
-        session: AsyncSession = Depends(get_async_session)
+        session: AsyncSession = Depends(get_async_session),
+        user: UserRead = Depends(current_user)
     ):
     
     stmt = select(transaction.c.amount, transaction.c.category_id, transaction.c.wallet_id).where(transaction.c.id == trasaction_data.id)
@@ -277,6 +294,9 @@ async def update_transaction(
         )
 
     old_amount, old_category_id, wallet_id = old_transaction_data
+
+    if not (await check_ownership_wallet(wallet_id, user.id, session)) and not user.is_superuser:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=USER_PERMISSION_ERROR)
 
     stmt = update(transaction).where(transaction.c.id == trasaction_data.id)
 

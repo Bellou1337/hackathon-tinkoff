@@ -1,13 +1,12 @@
 import time
+import os
+from email.message import EmailMessage
 
 from celery import Celery
-from fastapi import HTTPException, status
 import redis
-
 import google.generativeai as genai
-
 import smtplib
-from email.message import EmailMessage
+
 from .details import *
 
 # celery -A mycelery worker -P solo -l info
@@ -17,6 +16,13 @@ if __name__ == "mycelery":
     from config import config
     from details import *
     redis_db = redis.Redis(host=config["Redis"]["host"], port=config.get("Redis", "port"))
+
+    proxy = 'http://206.189.135.6:3128'
+
+    os.environ['http_proxy'] = proxy
+    os.environ['HTTP_PROXY'] = proxy
+    os.environ['https_proxy'] = proxy
+    os.environ['HTTPS_PROXY'] = proxy
 else:
     from .config import config
     from .database import redis_db
@@ -32,46 +38,27 @@ app.conf.broker_connection_retry_on_startup = True
 
 @app.task(name='mycelery.prompt_sender')
 def prompt_sender(prompt: str, key):
-
-    try:
-        MAX_ITER_COUNT = 50
+        MAX_ITER_COUNT = 2
         MAX_DELAY = 1
 
-        for attempt in range(MAX_ITER_COUNT):
-            response = model.generate_content(prompt)
+        for _ in range(MAX_ITER_COUNT):
+            try:
+                response = model.generate_content(prompt)
+                
+                if response and hasattr(response, 'text'):
+                        result = response.text
+                        redis_db.set(key, result, 172_800)
+                        return
+                
+                redis_data = redis_db.get(key).decode('utf-8')
+                        
+                if redis_data == "-1":
+                    redis_db.set(key,None)
+                    raise Exception()
             
-            if response and hasattr(response, 'text'):
-                    result = response.text
-                    redis_db.set(key, result, 172_800)
-                    break
-
-            time.sleep(MAX_DELAY)
-        
-        redis_data = redis_db.get(key).decode('utf-8')
-        
-        print(redis_data) 
-        
-        if redis_data == "-1":
-            redis_db.set(key,None)
-            raise HTTPException(
-                status_code = status.HTTP_404_NOT_FOUND,
-                detail = API_ERROR_SOMETHING_WITH_THE_DATA
-            )
-            
-        return {"detail" : OK}        
-        
-    except HTTPException as e:
-        print(e)
-        raise HTTPException(
-            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail = API_ERROR_SOMETHING_WITH_THE_DATA
-        )
-    except Exception as e:
-        print(e)
-        raise HTTPException(
-            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail = API_ERROR_SOMETHING_WITH_THE_DATA
-        )
+            except Exception as e:
+                print(e)
+                time.sleep(MAX_DELAY)
     
     
     

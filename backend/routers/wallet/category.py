@@ -5,8 +5,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import update, select, insert, delete
 from ...database import get_async_session
 from ...models import user, category, wallet, transaction 
-from ...schemas import NewCategory, ResponseDetail, ReadCategory, UpdateCategory
-from ...dependencies import current_user
+from ...schemas import NewCategory, ResponseDetail, ReadCategory, UpdateCategory, UserRead
+from ...dependencies import current_user, current_superuser
 from typing import Dict, List
 from ...details import *
 
@@ -39,7 +39,8 @@ category_router = APIRouter(
 )
 async def set_new_category(
         category_data: NewCategory, 
-        session: AsyncSession = Depends(get_async_session)
+        session: AsyncSession = Depends(get_async_session),
+        user: UserRead = Depends(current_superuser)
     ):
     
     try:
@@ -102,7 +103,8 @@ async def set_new_category(
 )
 async def remove_category(
         category_id: int = Body(embed=True),
-        session: AsyncSession = Depends(get_async_session)
+        session: AsyncSession = Depends(get_async_session),
+        user: UserRead = Depends(current_superuser)
     ): 
     
     try:        
@@ -204,7 +206,8 @@ async def get_category_list(
 )
 async def update_category(
         category_data: UpdateCategory = Body(embed=True),
-        session: AsyncSession = Depends(get_async_session)
+        session: AsyncSession = Depends(get_async_session),
+        user: UserRead = Depends(current_superuser)
     ):
 
     

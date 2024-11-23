@@ -16,6 +16,17 @@ wallet_router = APIRouter(
     tags = ["wallet"]
 )
 
+async def check_ownership_wallet(wallet_id: int, user_id, session: AsyncSession) -> bool:
+    stmt = select(wallet.c.user_id).where(wallet.c.id == wallet_id)
+    data = await session.execute(stmt)
+    
+    row = data.first()
+    
+    if not row:
+        return False
+
+    return user_id == row[0]
+
 @wallet_router.post(
     "/add",
     responses={
