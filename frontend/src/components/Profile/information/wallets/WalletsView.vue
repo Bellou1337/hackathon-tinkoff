@@ -44,7 +44,7 @@ const Wallets = ref([
 
 <template>
   <div class="flex flex-col gap-5 items-center">
-      <div class=" h-full grid grid-cols-3 gap-3 min-w-56 justify-center">
+      <div class=" h-full grid grid-cols-3 gap-3 min-w-56 justify-items-center">
       <wallet v-for="wallet in Wallets" 
       key="index"
       class="my-5"
@@ -53,6 +53,6 @@ const Wallets = ref([
       :banknote = wallet.banknote
       ></wallet>
     </div>
-    <a href="#" class=" hover:bg-yellow-300 active:bg-yellow-400 flex items-center justify-center rounded-xl shadow-xl text-xl text-center bg-slate-300 max-w-40 my-5"> Создать кошелек </a>
+    <router-link to="/profile/newWallet" class=" text-black bg-gray-200 hover:bg-gray-300 active:bg-gray-400 flex items-center justify-center rounded-xl shadow-xl text-xl text-center  max-w-40 my-5"> Создать кошелек </router-link>
   </div>
 </template>
