@@ -18,7 +18,7 @@ export default {
 </script>
 
 <template>
-  <header class="bg-white">
+  <header class=" bg-neutral-600 sticky top-0" >
     <div class="mx-auto flex h-16 max-w-screen-xl items-center gap-6 px-4 py-10 sm:px-6 lg:px-8">
       <div class="flex items-center gap-4 text-blue-600">
         <svg class="h-8" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -36,9 +36,15 @@ export default {
           <div class="hidden sm:flex sm:gap-4">
             <router-link
               class="block rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium text-blue-600 transition hover:text-blue-600/75"
-              to="/auth/register"
+              to="/profile"
             >
               Профиль
+            </router-link>
+            <router-link
+              class="block rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium text-blue-600 transition hover:text-blue-600/75"
+              to="/"
+            >
+              Домашняя страница
             </router-link>
 
             <router-link

@@ -1,5 +1,8 @@
 /** @type {import('tailwindcss').Config} */
+const plugin = require('tailwind-scrollbar');
+
 export default {
+  darkMode: 'media',
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
     extend: {
@@ -12,5 +15,8 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('tailwind-scrollbar'), // Подключение плагина
+    require('tailwind-scrollbar-hide') // (Опционально) Для скрытия скроллбаров
+  ],
 }
