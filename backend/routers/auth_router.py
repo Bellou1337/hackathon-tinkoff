@@ -72,7 +72,7 @@ def create_token(data: dict, expires_delta: timedelta | None = None):
         },
     }
 )
-async def set_new_email(new_email: str = Body(embed=True, examples=["user@example.com"]), user_info = Depends(current_user), request = Optional[Request]):
+async def set_new_email(request : Request, new_email: str = Body(embed=True, examples=["user@example.com"]), user_info = Depends(current_user)):
     if len(new_email) < 6 or len(new_email) > 255:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

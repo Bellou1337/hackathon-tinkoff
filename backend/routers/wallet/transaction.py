@@ -46,7 +46,8 @@ async def add_new_transaction(
         title = transaction_data.title,
         amount = transaction_data.amount,
         date = transaction_data.date.replace(tzinfo=None),
-        category_id = transaction_data.category_id
+        category_id = transaction_data.category_id,
+        wallet_id = transaction_data.wallet_id
     )
 
     try:
@@ -58,7 +59,7 @@ async def add_new_transaction(
     except IntegrityError:
         raise HTTPException(
             status_code= status.HTTP_404_NOT_FOUND,
-            detail=CATEGORY_NOT_FOUND,   
+            detail=CATEGORY_OR_TRANSACTION_NOT_FOUND,   
         )
 
 

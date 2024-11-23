@@ -9,17 +9,10 @@ class UserRead(schemas.BaseUser[int]):
     id: int
     username: str
     email: EmailStr
-    wallet_ids: List[int] = []
     
     is_active: bool = False
     is_superuser: bool = False
     is_verified: bool = False
-
-    @classmethod
-    def model_validate(cls, data):
-        if data.wallet_ids is None:
-            data.wallet_ids = []
-        return super().model_validate(data)
 
 
 class UserReadAll(UserRead):
@@ -56,5 +49,11 @@ class ResponseDetail(BaseModel):
 class NewTransaction(BaseModel):
     title: str
     category_id: int
+    wallet_id: int
     amount: float
     date: datetime
+
+class NewWallet(BaseModel):
+    name: str
+    balance: float | None = None
+    user_id: int
