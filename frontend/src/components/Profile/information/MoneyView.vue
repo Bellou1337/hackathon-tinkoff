@@ -1,5 +1,4 @@
 <template>
-<<<<<<< HEAD
   <div class="flex items-center justify-center lg:gap-10 gap-5 dark:bg-neutral-200 dark:rounded-lg">
     <!--Либо график либо те карточки оставляем-->
     <div class=" ">
@@ -8,16 +7,6 @@
     </div>
     <!-- Costs -->
     <!--
-=======
-    <div class="">
-      <!--Либо график либо те карточки оставляем-->
-        <div class=" flex items-center justify-center bg-white my-2 shadow-xl lg:gap-10 gap-5 dark:bg-neutral-200 rounded-lg p-5">
-          <!-- Передаем данные и настройки через props -->
-          <digr :data="chartData" :options="chartOptions" />
-        </div>
-      <!-- Costs -->
-       <!--
->>>>>>> 3af8846c7f918174b84009f5bc9bccf5e64d9334
       <div class="w-full">
         <a class=" bg-yellow-300 hover:bg-yellow-400  min-h-32 w-full flex items-center justify-center  rounded-xl shadow-xl">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-16 w-16 lg:h-40 lg:w-40 rounded-lg">
@@ -62,17 +51,10 @@ const chartData = {
     {
       label: 'Доходы-Расходы',
       data: [7000, 3000], //изменяемое значение (брать из бека)
-<<<<<<< HEAD
       backgroundColor: ['#42d457', '#d44242'],
       hoverBackgroundColor: ['#20d457', '#c44242'],
     },
   ],
-=======
-      backgroundColor: ['#FFE041', '##292929'],
-      hoverBackgroundColor: ['#ffe45c', '#171717']
-    }
-  ]
->>>>>>> 3af8846c7f918174b84009f5bc9bccf5e64d9334
 }
 
 // Настройки диаграммы
