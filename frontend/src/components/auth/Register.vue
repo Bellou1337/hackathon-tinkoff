@@ -1,6 +1,5 @@
 <script>
 import { ref, computed, watch } from 'vue'
-import { useRouter } from 'vue-router'
 import apiClient from '@/services'
 import { getCookie } from '@/utils/cookies'
 

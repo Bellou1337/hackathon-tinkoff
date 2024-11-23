@@ -1,12 +1,7 @@
 <script setup>
-import { ref } from 'vue'
-
 import UserInfoView from '@/components/profile/information/UserInfoView.vue'
 import MoneyView from '@/components/profile/information/MoneyView.vue'
 import WalletsView from '@/components/profile/information/wallets/WalletsView.vue'
-
-const name = ref('user')
-const email = ref('user@example.com')
 </script>
 
 <template>

@@ -31,13 +31,11 @@ export default {
         if (response.status === 200) {
           successMessage.value = 'Токен успешно проверен!'
           console.log('Токен установлен сервером')
-
-          document.cookie = `auth_token=${token}; path=/;`
         } else {
           errorMessage.value = response.data.message || 'Ошибка проверки токена.'
         }
       } catch (error) {
-        console.error('Ошибка проверки токена:', error.response.data)
+        console.error('Ошибка проверки токена:', error.response)
         if (error.response) {
           errorMessage.value = `Ошибка сервера: ${error.response.data.detail}`
         } else {
@@ -78,7 +76,7 @@ export default {
         </p>
         <p v-if="successMessage" class="text-green-500">
           {{ successMessage }}
-          <router-link class="underline font-bold" to="/">Перейти на главную страницу</router-link>
+          <router-link class="underline font-bold" to="/auth/login">Авторизоваться</router-link>
         </p>
       </div>
     </div>
