@@ -6,8 +6,6 @@ import { getCookie } from '@/utils/cookies'
 
 export default {
   setup() {
-    const router = useRouter()
-
     const username = ref('')
     const email = ref('')
     const firstPassword = ref('')

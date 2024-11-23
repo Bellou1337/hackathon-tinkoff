@@ -23,6 +23,7 @@ export default {
       try {
         const response = await apiClient.post('/auth/verify', {
           token: token,
+          withCredentials: true,
         })
 
         await console.log(response)

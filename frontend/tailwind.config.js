@@ -1,8 +1,8 @@
 /** @type {import('tailwindcss').Config} */
-const plugin = require('tailwind-scrollbar');
+const plugin = require('tailwind-scrollbar')
 
 export default {
-  darkMode: 'media',
+  darkMode: 'class',
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
     extend: {
@@ -11,12 +11,11 @@ export default {
       },
       colors: {
         'slight-gray': '#f6f7f8',
+        'slight-yellow': '#fff4bc',
+        'slight-black': '#313232',
         'auth-gray': '#757373',
       },
     },
   },
-  plugins: [
-    require('tailwind-scrollbar'), // Подключение плагина
-    require('tailwind-scrollbar-hide') // (Опционально) Для скрытия скроллбаров
-  ],
+  plugins: [require('tailwind-scrollbar'), require('tailwind-scrollbar-hide')],
 }

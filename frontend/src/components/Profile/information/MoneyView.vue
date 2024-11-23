@@ -1,12 +1,12 @@
 <template>
-    <div class="flex items-center justify-center lg:gap-10 gap-5 dark:bg-neutral-200 dark:rounded-lg">
-      <!--Либо график либо те карточки оставляем-->
-        <div class=" ">
-          <!-- Передаем данные и настройки через props -->
-          <digr :data="chartData" :options="chartOptions" />
-        </div>
-      <!-- Costs -->
-       <!--
+  <div class="flex items-center justify-center lg:gap-10 gap-5 dark:bg-neutral-200 dark:rounded-lg">
+    <!--Либо график либо те карточки оставляем-->
+    <div class=" ">
+      <!-- Передаем данные и настройки через props -->
+      <digr :data="chartData" :options="chartOptions" />
+    </div>
+    <!-- Costs -->
+    <!--
       <div class="w-full">
         <a class=" bg-yellow-300 hover:bg-yellow-400  min-h-32 w-full flex items-center justify-center  rounded-xl shadow-xl">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-16 w-16 lg:h-40 lg:w-40 rounded-lg">
@@ -19,8 +19,8 @@
         </a>
       </div>
 -->
-      <!-- Income -->
-       <!--
+    <!-- Income -->
+    <!--
       <div class="w-full">
         <a class="  bg-gray-300 hover:bg-yellow-300 active:bg-yellow-400 min-h-32 w-full flex items-center justify-center rounded-xl shadow-xl">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-16 w-16 lg:h-40 lg:w-40 rounded-lg">
@@ -33,19 +33,18 @@
         </a>
       </div>
         -->
-      
-    </div>
-  </template>
-  
-  <script setup>
-  import digr from '@/components/Diagramm/IncomeExpenseChart.vue'
-  import { ref } from 'vue'
-  
-  const costs = ref('1500')
-  const incomes = ref('2000')
-  const bancnot = ref('руб.')
+  </div>
+</template>
 
-  // Данные для диаграммы
+<script setup>
+import digr from '@/components/Diagramm/IncomeExpenseChart.vue'
+import { ref } from 'vue'
+
+const costs = ref('1500')
+const incomes = ref('2000')
+const bancnot = ref('руб.')
+
+// Данные для диаграммы
 const chartData = {
   labels: ['Доходы', 'Расходы'],
   datasets: [
@@ -53,9 +52,9 @@ const chartData = {
       label: 'Доходы-Расходы',
       data: [7000, 3000], //изменяемое значение (брать из бека)
       backgroundColor: ['#42d457', '#d44242'],
-      hoverBackgroundColor: ['#20d457', '#c44242']
-    }
-  ]
+      hoverBackgroundColor: ['#20d457', '#c44242'],
+    },
+  ],
 }
 
 // Настройки диаграммы
@@ -64,14 +63,12 @@ const chartOptions = {
   plugins: {
     legend: {
       display: true,
-      position: 'top'
+      position: 'top',
     },
     title: {
       display: true,
-      text: 'Доходы и Расходы'
-    }
-  }
+      text: 'Доходы и Расходы',
+    },
+  },
 }
-
-  </script>
-  
+</script>
