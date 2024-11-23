@@ -10,18 +10,18 @@ app = FastAPI(
 )
 
 origins = [
-"http://localhost:3000",
-"http://127.0.0.1:3000",
-"http://git-ts2.ru:8000",
-"*",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://git-ts2.ru:8000",
+    "*",
 ]
 
 app.add_middleware(
-CORSMiddleware,
-allow_origins=origins, 
-allow_credentials=True,
-allow_methods=["*"],
-allow_headers=["*"],
+    CORSMiddleware,
+    allow_origins=origins, 
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
