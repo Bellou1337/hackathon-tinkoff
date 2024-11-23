@@ -10,16 +10,15 @@ from ..mycelery import prompt_sender
 from ..dependencies import current_user, current_superuser
 
 transaction_router = APIRouter(
-    prefix = "/gemini",
-    tags = ["gemini"]
+    prefix = "/recomendations",
+    tags = ["recomendations"]
 )
 
 @transaction_router.post(
-    "/recomendations",
+    "/generate",
     responses={
         200: {
             "model": GeminiResponse,
-            
             "description": "Successfully got recommendations"
         },
         404: {
@@ -40,7 +39,7 @@ transaction_router = APIRouter(
         }
     }
 )
-async def gemini(gemini_data: GetTransaction, session: AsyncSession = Depends(get_async_session), user: UserRead = Depends(current_user)):
+async def create_recomendation_generate_task(gemini_data: GetTransaction, session: AsyncSession = Depends(get_async_session), user: UserRead = Depends(current_user)):
     
     if not (await check_ownership_wallet(gemini_data.wallet_id, user.id, session)) and not user.is_superuser:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=USER_PERMISSION_ERROR)
@@ -83,11 +82,10 @@ async def gemini(gemini_data: GetTransaction, session: AsyncSession = Depends(ge
                 
     redis_db.set(key, -1, 172_800)
     prompt_sender.delay(prompt_message, key)
-    # prompt_sender(prompt_message, key)
 
 
 @transaction_router.post(
-    "/get_recomendations",
+    "/get",
     responses={
         200: {
             "model": GeminiResponse,
@@ -112,7 +110,7 @@ async def gemini(gemini_data: GetTransaction, session: AsyncSession = Depends(ge
         }
     }
 )
-async def get_recomendation(gemini_data: GetGeminiRecomendation, session: AsyncSession = Depends(get_async_session), user: UserRead = Depends(current_user)):
+async def get_generated_recomendation(gemini_data: GetGeminiRecomendation, session: AsyncSession = Depends(get_async_session), user: UserRead = Depends(current_user)):
 
     if not (await check_ownership_wallet(gemini_data.wallet_id, user.id, session)) and not user.is_superuser:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=USER_PERMISSION_ERROR)
