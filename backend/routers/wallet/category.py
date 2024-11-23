@@ -229,7 +229,7 @@ async def update_category(
 @category_router.get(
     "/get_all",
     responses={
-        200: {"model": List[NewCategory]},
+        200: {"model": List[ReadCategory]},
         404: {
             "description": "Bad Request",
             "content": {
@@ -252,24 +252,21 @@ async def get_all_category(
         session: AsyncSession = Depends(get_async_session)
     ):
 
-    try:
-        stmt = select(category.c.name, category.c.is_income)
-        
-        result = await session.execute(stmt)
-        rows = result.all()
-        
-        if not rows:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=CATEGORY_NOT_FOUND
-            )
-        
-        return [
-            NewCategory(
-                name = row[0],
-                is_income = row[1]
-            ) for row in rows
-        ]
+    stmt = select(category.c.name, category.c.is_income, category.c.id)
     
-    except Exception:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=SERVER_ERROR_SOMETHING_WITH_THE_DATA)
+    result = await session.execute(stmt)
+    rows = result.all()
+    
+    if not rows:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=CATEGORY_NOT_FOUND
+        )
+    
+    return [
+        ReadCategory(
+            name = row[0],
+            is_income = row[1],
+            id = row[2]
+        ) for row in rows
+    ]

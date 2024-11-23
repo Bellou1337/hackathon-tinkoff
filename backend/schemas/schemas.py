@@ -38,6 +38,9 @@ class NewCategory(BaseModel):
 class ReadCategory(NewCategory):
     id: int
 
+class ReadCategory(NewCategory):
+    id: int
+
 class UpdateCategory(BaseModel):
     id: int
     name: str | None = None
