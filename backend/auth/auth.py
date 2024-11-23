@@ -1,4 +1,4 @@
-from fastapi_users.authentication import CookieTransport, JWTStrategy, AuthenticationBackend
+from fastapi_users.authentication import JWTStrategy, AuthenticationBackend, BearerTransport
 from fastapi_users import FastAPIUsers
 
 from ..database.database import User
@@ -8,10 +8,7 @@ from ..config import config
 SECRET = config['Miscellaneous']['Secret']
 TOKEN_EXPIRE = config.get("Miscellaneous", "token_expire")
 
-cookie_transport = CookieTransport(
-    cookie_max_age=TOKEN_EXPIRE,
-    cookie_secure=False
-)
+transport = BearerTransport("auth/jwt/login")
 
 def get_jwt_strategy() -> JWTStrategy:
     return JWTStrategy(secret=SECRET, lifetime_seconds=TOKEN_EXPIRE)
@@ -20,7 +17,7 @@ def get_jwt_strategy() -> JWTStrategy:
 
 auth_backend = AuthenticationBackend(
     name="auth",
-    transport=cookie_transport,
+    transport=transport,
     get_strategy=get_jwt_strategy,
 )
 
