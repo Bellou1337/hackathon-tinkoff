@@ -5,3 +5,4 @@
 1. Окно создания нового кошелька (скорее всего требует доработки) profile/information/wallets. Там же компонент внешнего вида Wallet и компонент-отображение кошельков WalletsView
 2. Выбранный кошелек. components/ChoosenWallet/. В этой папке находятся компонент самой странички и компонент отображения окна транзакции.
 3. Диаграмма находится в components/Diagramm. Для нее я скачал либу Chart.js (npm install chart.js vue-chart-3)
+4. Scrollbar можно стилизовать (npm install tailwind-scrollbar)

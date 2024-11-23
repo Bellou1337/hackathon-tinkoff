@@ -1,6 +1,7 @@
 <template>
-    <div class="flex items-center justify-center lg:gap-10 gap-5">
-        <div class="pb-5">
+    <div class="flex items-center justify-center lg:gap-10 gap-5 dark:bg-neutral-200 dark:rounded-lg">
+      <!--Либо график либо те карточки оставляем-->
+        <div class=" ">
           <!-- Передаем данные и настройки через props -->
           <digr :data="chartData" :options="chartOptions" />
         </div>

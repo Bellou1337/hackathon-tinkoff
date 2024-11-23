@@ -105,9 +105,8 @@ const date = ref('12.05.2005');
         <p class="text-5xl bg-gradient-to-tr from-slate-400 to-slate-100 rounded-lg h-52 flex items-center bg-slate-300">Имя кошелька</p>
         <p class="text-3xl border-b-2 border-black dark:border-white dark:text-white pb-5">Баланс руб.</p>
     </div>
-
-    <div class=" max-h-screen mt-5 min-h-96 md:w-1/2 w-full md:m-5 overflow-y-auto flex flex-col items-center mb-10">
-      <!-- Увеличиваем отступ сверху, чтобы липкий элемент не перекрывал содержимое -->
+<!--В идеале окно прокрутки трогать по минимуму. Эту залупу хуй настроишь нормально-->
+    <div class=" max-h-screen mt-5 min-h-96 md:w-1/2 w-full md:m-5 overflow-y-auto scrollbar flex flex-col items-center mb-10">
       <div class="sticky top-0 bg-yellow-300/50 dark:bg-yellow-500/90 text-xl text-center rounded-md w-48 z-10 mb-4">{{ date }}</div>
       <div class="w-full flex flex-col items-center">
         <tranz v-for="(tr, index) in arr" :key="index"
