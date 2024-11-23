@@ -6,7 +6,7 @@ import WalletsView from '@/components/profile/information/wallets/WalletsView.vu
 </script>
 
 <template>
-  <div class=" dark:bg-neutral-800 bg-slight-gray flex flex-col px-5 h-screen">
+  <div class=" dark:bg-neutral-800 bg-slight-gray flex flex-col px-5 min-h-screen">
     <div class=" dark:text-white border-b-2 border-black pb-5">
         <UserInfoView/>
       <div class="flex flex-col sm:flex-col md:flex-row lg:flex-row items-center justify-center gap-5">

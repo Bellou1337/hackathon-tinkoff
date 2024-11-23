@@ -96,7 +96,7 @@ const date = ref('12.05.2005');
 </script>
 
 <template>
-  <div class="dark:bg-gradient-to-r dark:from-neutral-800 dark:to-neutral-600 md:bg-gradient-to-r bg-gradient-to-b p-2 from-slate-300 to-slight-gray flex flex-col md:flex-row h-screen">
+  <div class="dark:bg-gradient-to-r dark:from-neutral-800 dark:to-neutral-600 md:bg-gradient-to-r bg-gradient-to-b p-2 from-slate-300 to-slight-gray flex flex-col md:flex-row min-h-screen">
     <div class=" flex flex-col gap-5 items-center justify-center md:w-1/2 w-full">
         <div class="border-b-2 pb-5 border-black dark:border-white">
           <!-- Передаем данные и настройки через props -->
