@@ -9,7 +9,7 @@ from ...schemas import NewTransaction, ResponseDetail, UpdateTransaction, GetTra
 from ...dependencies import current_user
 from typing import Dict
 from ...details import *
-from .wallet import check_ownership_wallet
+from .wallet import check_ownership_wallet, check_can_read_wallet
 from ...dependencies import current_user, current_superuser
 
 transaction_router = APIRouter(
@@ -171,7 +171,7 @@ async def get_transaction_by_date(
         user: UserRead = Depends(current_user)
     ):
 
-    if not (await check_ownership_wallet(get_transaction_data.wallet_id, user.id, session)) and not user.is_superuser:
+    if not (await check_can_read_wallet(get_transaction_data.wallet_id, user.id, session)) and not user.is_superuser:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=USER_PERMISSION_ERROR)
 
     res = await transaction_by_date(get_transaction_data, session)
@@ -230,7 +230,7 @@ async def get_transaction_by_id(
             detail = TRANSACTION_NOT_FOUND
         )
     
-    if not (await check_ownership_wallet(item[1], user.id, session)) and not user.is_superuser:
+    if not (await check_can_read_wallet(item[1], user.id, session)) and not user.is_superuser:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=USER_PERMISSION_ERROR)
     
     return ReadTransaction(
@@ -254,7 +254,7 @@ async def get_transaction_by_wallet_id(
         user: UserRead = Depends(current_user)
     ):
 
-    if not (await check_ownership_wallet(wallet_id, user.id, session)) and not user.is_superuser:
+    if not (await check_can_read_wallet(wallet_id, user.id, session)) and not user.is_superuser:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=USER_PERMISSION_ERROR)
     
     stmt = select(transaction).where(transaction.c.wallet_id == wallet_id)

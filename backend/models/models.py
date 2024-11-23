@@ -25,7 +25,7 @@ wallet = Table(
     Column("user_id", Integer, ForeignKey("user.id"), nullable=False),
     Column("name", String, nullable=False),
     Column("balance", Float, nullable= False, default=0),
-    
+    Column("is_shared", Boolean, nullable= False, default=False),
 )
 
 transaction = Table(

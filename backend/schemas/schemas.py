@@ -68,6 +68,7 @@ class UpdateWallet(BaseModel):
     name: str | None = None
     balance: float | None = None    
     user_id: int | None = None
+    is_shared: bool | None = None
 
 class UpdateTransaction(BaseModel):
     id: int

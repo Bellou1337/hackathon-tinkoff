@@ -27,6 +27,17 @@ async def check_ownership_wallet(wallet_id: int, user_id, session: AsyncSession)
 
     return user_id == row[0]
 
+async def check_can_read_wallet(wallet_id: int, user_id, session: AsyncSession) -> bool:
+    stmt = select(wallet.c.user_id, wallet.c.is_shared).where(wallet.c.id == wallet_id)
+    data = await session.execute(stmt)
+    
+    row = data.first()
+    
+    if not row:
+        return False
+
+    return user_id == row[0] or row[1]
+
 @wallet_router.post(
     "/add",
     responses={
@@ -184,6 +195,8 @@ async def update_wallet(wallet_data: UpdateWallet,session: AsyncSession = Depend
             update_values["balance"] = wallet_data.balance
         if wallet_data.user_id is not None:
             update_values["user_id"] = wallet_data.user_id
+        if wallet_data.is_shared is not None:
+            update_values["is_shared"] = wallet_data.is_shared
         
         query = update(wallet).where(wallet.c.id == wallet_data.id).values(**update_values)
         await session.execute(query)
@@ -288,7 +301,7 @@ async def get_wallet_by_id(wallet_data: WhalletId, session: AsyncSession = Depen
 
     owner = row[1]
 
-    if user.id == owner or user.is_superuser:
+    if user.is_superuser or (await check_can_read_wallet(wallet_data.id, user.id, session)):
         return res
     
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=USER_PERMISSION_ERROR)
