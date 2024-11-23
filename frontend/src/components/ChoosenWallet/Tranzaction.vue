@@ -2,13 +2,17 @@
 defineProps({
     to:String,
     spend:String,
-    bancnote:String
+    banknote:String,
+    date: String,
 })
 </script>
 
 <template>
-  <div class="flex-col w-full max-w-96 my-1 h-20 bg-slate-200 flex items-center justify-center">
-    <p class="text-xl"> {{ to }}</p>
-    <p class="text-3xl">{{ spend }} {{ bancnote }}</p>
+  <div class="flex w-full min-h-20 max-h-44 h-auto bg-slate-200 rounded-xl px-5 shadow-xl justify-between items-center">  
+    <div>
+      <p class="text-xl"> {{ to }}</p>
+      <p class=" inline-block">{{ date }}</p>
+    </div>
+    <p class="text-3xl">{{ spend }} {{ banknote }}</p>
   </div>
 </template>
