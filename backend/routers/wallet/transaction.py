@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import update, select, insert, delete
 from ...database import get_async_session
-from ...models import user, wallet, transaction 
+from ...models import transaction, category, wallet
 from ...schemas import NewTransaction, ResponseDetail
 from ...dependencies import current_user
 from typing import Dict
@@ -18,7 +18,7 @@ transaction_router = APIRouter(
 @transaction_router.post(
     "/add",
     responses={
-        200: {"model": ResponseDetail, "description": "Successfully created category"},
+        200: {"model": ResponseDetail, "description": "Successfully created transaction"},
         400: {
             "description": "Bad Request",
             "content": {
@@ -41,17 +41,30 @@ async def add_new_transaction(
         transaction_data: NewTransaction, 
         session: AsyncSession = Depends(get_async_session)
     ):
-    
-    query = insert(transaction).values(
-        title = transaction_data.title,
-        amount = transaction_data.amount,
-        date = transaction_data.date.replace(tzinfo=None),
-        category_id = transaction_data.category_id,
-        wallet_id = transaction_data.wallet_id
-    )
-
     try:
+        query = insert(transaction).values(
+            title = transaction_data.title,
+            amount = transaction_data.amount,
+            date = transaction_data.date.replace(tzinfo=None),
+            category_id = transaction_data.category_id,
+            wallet_id = transaction_data.wallet_id
+        )
         await session.execute(query)
+
+        query = select(category).where(category.c.id == transaction_data.category_id)
+        category_data = (await session.execute(query)).fetchone()
+
+        amount = transaction_data.amount
+        if not category_data[2]:
+            amount = -amount
+        
+        query = (
+            update(wallet)
+            .where(wallet.c.id == transaction_data.wallet_id)
+            .values(balance=wallet.c.balance + amount)
+        )
+        await session.execute(query)
+
         await session.commit()
 
         return {"detail": OK}
@@ -64,47 +77,68 @@ async def add_new_transaction(
 
 
 
-# @category_router.post(
-#     "/delete",
-#     responses={
-#         200: {"model": ResponseDetail,"detail": OK},
-#         400: {
-#             "description": "Bad Request",
-#             "content": {
-#                 "application/json": {
-#                     "example": {"detail": CATEGORY_NOT_FOUND}
-#                 }
-#             }
-#         },
-#         500: {
-#             "description": "Internal Server Error",
-#             "content": {
-#                 "application/json": {
-#                     "example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}
-#                 }
-#             }
-#         }
-#     }
-# )
-# async def remove_category(
-#         category_id: int = Body(embed=True),
-#         session: AsyncSession = Depends(get_async_session)
-#     ): 
+@transaction_router.post(
+    "/delete",
+    responses={
+        200: {"model": ResponseDetail,"detail": OK},
+        400: {
+            "description": "Bad Request",
+            "content": {
+                "application/json": {
+                    "example": {"detail": TRANSACTION_NOT_FOUND}
+                }
+            }
+        },
+        500: {
+            "description": "Internal Server Error",
+            "content": {
+                "application/json": {
+                    "example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}
+                }
+            }
+        }
+    }
+)
+async def remove_transaction(
+        transaction_id: int = Body(embed=True),
+        session: AsyncSession = Depends(get_async_session)
+    ): 
     
-#     try:        
-#         query = delete(category).where(category.c.id == category_id)
-        
-#         await session.execute(query)
-#         await session.commit()
-        
-#         return {"detail" : OK}
-    
-#     except Exception:
-#         raise HTTPException(
-#             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
-#             detail = SERVER_ERROR_SOMETHING_WITH_THE_DATA
-#         )
+    query = select(transaction).where(transaction.c.id == transaction_id)
+    transaction_data = (await session.execute(query)).fetchone()
 
+    if transaction_data is None:
+        raise HTTPException(
+            status_code = status.HTTP_400_BAD_REQUEST,
+            detail = TRANSACTION_NOT_FOUND
+        )
+
+    query = select(category).where(category.c.id == transaction_data[2])
+    category_data = (await session.execute(query)).fetchone()
+
+    if category_data is None:
+        raise HTTPException(
+            status_code = status.HTTP_400_BAD_REQUEST,
+            detail = CATEGORY_NOT_FOUND
+        )
+
+    query = delete(transaction).where(transaction.c.id == transaction_id)
+    await session.execute(query)
+
+
+    amount = transaction_data[4]
+    if category_data[2]:
+        amount = -amount
+    
+    query = (
+        update(wallet)
+        .where(wallet.c.id == transaction_data[1])
+        .values(balance=wallet.c.balance + amount)
+    )
+    await session.execute(query)
+    await session.commit()
+    
+    return {"detail" : OK}
 
 # @category_router.post(
 #     "/get",
