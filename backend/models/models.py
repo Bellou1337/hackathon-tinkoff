@@ -10,7 +10,6 @@ user = Table(
     Column("email", String, nullable = False),
     Column("hashed_password", String, nullable = False),
     Column("username", String, nullable = False),
-    Column("wallet_ids", ARRAY(Integer), default=[]),
     Column("registered_at", TIMESTAMP, default=datetime.utcnow),  
 
     Column("is_active", Boolean, default=True, nullable=False),
@@ -22,9 +21,9 @@ user = Table(
 wallet = Table(
     "wallet",
     meta_data,
-    Column("id", Integer,primary_key=True),
+    Column("id", Integer, primary_key=True),
+    Column("user_id", Integer, ForeignKey("user.id"), nullable=False),
     Column("name", String, nullable=False),
-    Column("transaction_ids", ARRAY(Integer), default=[]),
     Column("balance", Float, nullable= False, default=0),
     
 )
@@ -33,6 +32,7 @@ transaction = Table(
     "transaction",
     meta_data,
     Column("id", Integer, primary_key=True),
+    Column("wallet_id", Integer, ForeignKey("wallet.id"), nullable=False),
     Column("category_id", Integer, ForeignKey("category.id"), nullable=False),
     Column("title", String, nullable=False),
     Column("amount", Float, nullable=False),
