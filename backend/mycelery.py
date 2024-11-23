@@ -43,7 +43,7 @@ def prompt_sender(prompt: str, key):
             
             if response and hasattr(response, 'text'):
                     result = response.text
-                    redis_db.set(key, result)
+                    redis_db.set(key, result, 172_800)
                     return {"detail " : result}
 
             time.sleep(MAX_DELAY)
