@@ -1,5 +1,5 @@
 <template>
-  <div class="">
+  <div class="flex items-center justify-center lg:gap-10 gap-5 dark:bg-neutral-200 dark:rounded-lg">
     <!--Либо график либо те карточки оставляем-->
     <div
       class="flex items-center justify-center bg-white my-2 shadow-xl lg:gap-10 gap-5 dark:bg-neutral-200 rounded-lg p-5"
@@ -9,17 +9,17 @@
     </div>
     <!-- Costs -->
     <!--
-    <div class="w-full">
-      <a class=" bg-yellow-300 hover:bg-yellow-400  min-h-32 w-full flex items-center justify-center  rounded-xl shadow-xl">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-16 w-16 lg:h-40 lg:w-40 rounded-lg">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6 9 12.75l4.286-4.286a11.948 11.948 0 0 1 4.306 6.43l.776 2.898m0 0 3.182-5.511m-3.182 5.51-5.511-3.181" />
-        </svg>
-        <div class="mx-5">
-          <p class="text-center text-xl text-gray-600"> Расходы</p>
-          <p class="text-3xl lg:text-7xl">{{ costs }} {{ bancnot }}</p>
-        </div>
-      </a>
-    </div>
+      <div class="w-full">
+        <a class=" bg-yellow-300 hover:bg-yellow-400  min-h-32 w-full flex items-center justify-center  rounded-xl shadow-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-16 w-16 lg:h-40 lg:w-40 rounded-lg">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6 9 12.75l4.286-4.286a11.948 11.948 0 0 1 4.306 6.43l.776 2.898m0 0 3.182-5.511m-3.182 5.51-5.511-3.181" />
+          </svg>
+          <div class="mx-5">
+            <p class="text-center text-xl text-gray-600"> Расходы</p>
+            <p class="text-3xl lg:text-7xl">{{ costs }} {{ bancnot }}</p>
+          </div>
+        </a>
+      </div>
 -->
     <!-- Income -->
     <!--
@@ -53,8 +53,8 @@ const chartData = {
     {
       label: 'Доходы-Расходы',
       data: [7000, 3000], //изменяемое значение (брать из бека)
-      backgroundColor: ['#FFE041', '##292929'],
-      hoverBackgroundColor: ['#ffe45c', '#171717'],
+      backgroundColor: ['#42d457', '#d44242'],
+      hoverBackgroundColor: ['#20d457', '#c44242'],
     },
   ],
 }

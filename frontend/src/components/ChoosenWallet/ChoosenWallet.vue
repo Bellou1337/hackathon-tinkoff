@@ -107,7 +107,7 @@ const date = ref('12.05.2005');
 </script>
 
 <template>
-  <div class="dark:bg-gradient-to-r dark:from-neutral-800 dark:to-neutral-600  bg-slight-gray flex flex-col md:flex-row min-h-screen justify-center gap-10">
+  <div class="dark:bg-gradient-to-r px-2 dark:from-neutral-800 dark:to-neutral-600  bg-slight-gray flex flex-col md:flex-row min-h-screen justify-center items-center md:items-start gap-10 pb-5">
     <div class=" flex flex-col gap-5 items-center  md:w-1/2 w-full mt-5">
        
       <div class="border-b-2 pb-5 border-black dark:border-white">
@@ -121,20 +121,19 @@ const date = ref('12.05.2005');
         <p class="text-3xl border-b-2 border-black dark:border-white dark:text-white pb-5">Баланс руб.</p>
     </div>
 <!--В идеале окно прокрутки трогать по минимуму. Эту залупу хуй настроишь нормально-->
-<div class="flex flex-col items-center gap-5 w-1/2 mt-20">
-    <p class=" text-3xl">Транзакции</p>
-      <div class="rounded-lg max-h-40  min-h-80 w-full overflow-y-auto scrollbar flex flex-col items-center justify-center mb-2">
-      <tranz v-for="tranzaction in arr" 
+<div class="mt-20 rounded-lg max-h-[30rem] md:w-1/2 w-full pl-4 overflow-y-auto flex flex-col mb-2 scrollbar">
+  <div class="flex flex-col w-full min-h-20 h-full rounded-xl justify-between items-center my-1">
+    <tranz v-for="tranzaction in arr" 
       key="index"
-      class="my-1"
+      class="my-2"
       :to="tranzaction.to"
       :spend = "tranzaction.spend"
       :banknote = "tranzaction.ban"
       :date="tranzaction.date"
       ></tranz>
     </div>
-  </div>
-  </div>
+    </div>
+</div>
 </template>
 
 <style>

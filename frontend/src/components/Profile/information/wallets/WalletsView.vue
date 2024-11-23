@@ -43,16 +43,18 @@ const Wallets = ref([
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-5">
+  <div class=" mt-10 flex flex-col items-center gap-5">
     <p class=" text-3xl">Текущие кошельки</p>
-      <div class="  rounded-lg max-h-[10rem] mt-5 min-h-80 w-full overflow-y-auto scrollbar flex flex-col items-center justify-center mb-2">
-      <wallet v-for="wallet in Wallets" 
-      key="index"
-      class="my-1"
-      :Naming=wallet.naming
-      :countOfMoney = wallet.countOfMoney
-      :banknote = wallet.banknote
-      ></wallet>
+    <div class="rounded-lg max-h-80 w-full pl-4 overflow-y-auto flex flex-col mb-2 scrollbar">
+      <div class="flex flex-col w-full min-h-20 h-full rounded-xl justify-between items-center my-1">
+        <wallet v-for="wal in Wallets" 
+          key="index"
+          class="my-2"
+          :Naming="wal.naming"
+          :countOfMoney = "wal.countOfMoney"
+          :banknote = "wal.banknote"
+          ></wallet>  
+        </div>
     </div>
     <router-link to="/profile/newWallet" class=" text-black bg-gray-200 hover:bg-gray-300 active:bg-gray-400 flex items-center justify-center rounded-xl shadow-xl text-xl text-center  max-w-40 my-5"> Создать кошелек </router-link>
   </div>
