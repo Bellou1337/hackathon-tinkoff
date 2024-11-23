@@ -56,6 +56,8 @@ class NewTransaction(BaseModel):
 class NewWallet(BaseModel):
     name: str
     balance: float | None = None
+
+class NewWalletByUserId(NewWallet):
     user_id: int
     
 class RemoveWallet(BaseModel):

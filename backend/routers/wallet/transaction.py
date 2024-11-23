@@ -231,6 +231,35 @@ async def get_transaction_by_id(
         )
 
 @transaction_router.post(
+    "/get_by_wallet_id",
+    responses={
+        200: {"model": list[ReadTransaction]}
+    }
+)
+async def get_transaction_by_wallet_id(
+        wallet_id: int = Body(embed=True),
+        session: AsyncSession = Depends(get_async_session)
+    ):
+    
+    stmt = select(transaction).where(transaction.c.wallet_id == wallet_id)
+    
+    data = (await session.execute(stmt)).all()
+    
+    res: list[ReadTransaction] = []
+        
+    for item in data:
+        res.append(ReadTransaction(
+            id=item[0],
+            title=item[3],
+            category_id=item[2],
+            wallet_id=item[1],
+            amount=item[4],
+            date=item[5]
+        ))
+
+    return res
+
+@transaction_router.post(
     "/update"
 )
 async def update_transaction(
