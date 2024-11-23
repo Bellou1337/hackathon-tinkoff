@@ -32,9 +32,7 @@ app.include_router(
 )
 
 app.include_router(
-    wallet.router,
-    prefix="/wallet",
-    tags=["wallet"]
+    wallet.router
 )
 
 @app.get('/')

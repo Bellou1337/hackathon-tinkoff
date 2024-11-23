@@ -12,7 +12,7 @@ from ...details import *
 
 wallet_router = APIRouter(
     prefix = "/wallet",
-    tags = ["wallet_ops"]
+    tags = ["wallet"]
 )
 
 @wallet_router.post(
