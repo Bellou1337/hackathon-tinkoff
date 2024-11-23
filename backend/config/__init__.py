@@ -21,5 +21,8 @@ config = Configure(default_config={
     "Miscellaneous": {
         "Secret": "",
         "token_expire": 3600
+    },
+    "Gemini": {
+        "api_key": ""
     }
 })

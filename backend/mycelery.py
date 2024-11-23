@@ -2,13 +2,9 @@ import time
 
 from celery import Celery
 from fastapi import HTTPException, status
+import redis
 
 import google.generativeai as genai
-from .config import config as api_config
-from .details import *
-
-
-from .database import redis_db
 
 import smtplib
 from email.message import EmailMessage
@@ -19,10 +15,13 @@ from email.message import EmailMessage
 
 if __name__ == "mycelery":
     from config import config
+    from details import *
+    redis_db = redis.Redis(host=config["Redis"]["host"], port=config.get("Redis", "port"))
 else:
     from .config import config
+    from .database import redis_db
 
-genai.configure(api_key=api_config["Gemini"]["API_KEY"])
+genai.configure(api_key=config["Gemini"]["API_KEY"])
 
 model = genai.GenerativeModel(model_name='gemini-1.5-flash')
 

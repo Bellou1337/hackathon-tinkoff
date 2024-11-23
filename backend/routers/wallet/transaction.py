@@ -183,7 +183,7 @@ async def transaction_by_date(
                 date=item[5]
             ))
 
-            return res
+        return res
     
     except Exception:
         raise HTTPException(
