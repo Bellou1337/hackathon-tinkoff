@@ -86,3 +86,15 @@ class GetTransaction(BaseModel):
     wallet_id: int
     start: datetime
     end: datetime
+    
+class UserWalletId(BaseModel):
+    user_id: int
+
+class ReadWallet(BaseModel):
+    id: int
+    name: str
+    balance: float
+    user_id: int
+
+class WhalletId(BaseModel):
+    id: int

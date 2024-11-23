@@ -5,9 +5,9 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import update, select, insert, delete
 from ...database import get_async_session
 from ...models import user, wallet, transaction 
-from ...schemas import NewWallet, ResponseDetail, RemoveWallet,UpdateWallet
+from ...schemas import NewWallet, ResponseDetail, RemoveWallet,UpdateWallet, UserWalletId, ReadWallet, WhalletId
 from ...dependencies import current_user
-from typing import Dict
+from typing import List
 from ...details import *
 
 wallet_router = APIRouter(
@@ -136,3 +136,70 @@ async def update_wallet(wallet_data: UpdateWallet,session: AsyncSession = Depend
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=SERVER_ERROR_SOMETHING_WITH_THE_DATA
         )
+
+@wallet_router.post(
+    "/wallet_by_user_id",
+    responses={
+        200: {"model": List[ReadWallet], "description": "Successfully retrieved wallet"},
+        404: {"description": "Not Found", "content": {"application/json": {"example": {"detail": WALLET_NOT_FOUND}}}},
+        500: {"description": "Internal Server Error", "content": {"application/json": {"example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}}}}
+    }
+)
+async def get_wallet_by_user_id(wallet_data: UserWalletId, session: AsyncSession = Depends(get_async_session)):
+
+    try:
+        stmt = select(wallet).where(wallet.c.user_id == wallet_data.user_id)
+        result = await session.execute(stmt)
+
+        rows = result.all()
+        
+        if not rows:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=WALLET_NOT_FOUND
+            )
+
+        return [
+            ReadWallet(
+                id=row[0],
+                name=row[2],
+                balance=row[3],
+                user_id=row[1]
+            ) for row in rows
+        ]
+
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=SERVER_ERROR_SOMETHING_WITH_THE_DATA)
+
+
+@wallet_router.post(
+    "/get_wallet_by_id",
+    responses={
+        200: {"model": ReadWallet, "description": "Successfully retrieved wallet"},
+        404: {"description": "Not Found", "content": {"application/json": {"example": {"detail": WALLET_NOT_FOUND}}}},
+        500: {"description": "Internal Server Error", "content": {"application/json": {"example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}}}}
+    }
+)
+async def get_wallet_by_id(wallet_data: WhalletId,session: AsyncSession = Depends(get_async_session)):
+    
+    try:
+        
+        stmt = select(wallet).where(wallet.c.id == wallet_data.id)
+        
+        result = await session.execute(stmt)
+        
+        row = result.first()
+        
+        if not row:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=WALLET_NOT_FOUND)
+        
+        return ReadWallet(
+            id=row[0],
+            name=row[2],
+            balance=row[3],
+            user_id=row[1]
+        )
+        
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=SERVER_ERROR_SOMETHING_WITH_THE_DATA)
+    
