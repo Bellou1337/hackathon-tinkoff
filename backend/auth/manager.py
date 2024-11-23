@@ -37,7 +37,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
                 }
         )
         
-        smtp_sender.send_HTML_mail(user.email, "Сброс пароля", html.body.decode())
+        smtp_sender.send_HTML_mail_task(user.email, "Сброс пароля", html.body.decode())
 
     async def on_after_request_verify(
         self, user: User, token: str, request: Optional[Request] = None
@@ -49,7 +49,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
                 }
         )
         
-        smtp_sender.send_HTML_mail(user.email, "Подтверждение аккаунта", html.body.decode())
+        smtp_sender.send_HTML_mail_task(user.email, "Подтверждение аккаунта", html.body.decode())
 
     async def on_after_login(self, user: User, request = Optional[Request], response = None):
         pass

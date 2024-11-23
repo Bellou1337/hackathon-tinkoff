@@ -14,6 +14,10 @@ config = Configure(default_config={
         "email": "",
         "password": ""
     },
+    "Redis": {
+        "host": "localhost",
+        "port": 6379
+    },
     "Miscellaneous": {
         "Secret": "",
         "token_expire": 3600

@@ -101,7 +101,7 @@ async def set_new_email(request : Request, new_email: str = Body(embed=True, exa
             }
     )
 
-    smtp_sender.send_HTML_mail(new_email, "Смена почты", html.body.decode())
+    smtp_sender.send_HTML_mail_task(new_email, "Смена почты", html.body.decode())
 
     return {"detail": OK}
     
