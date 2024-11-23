@@ -143,30 +143,54 @@ async def remove_transaction(
 @transaction_router.post(
     "/get_by_date",
     responses={
-        200: {"model": list[ReadTransaction]}
+        200: {"model": list[ReadTransaction]},
+        500: {
+            "description": "Internal Server Error",
+            "content": {
+                "application/json": {
+                    "example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}
+                }
+            }
+        }
     }
 )
 async def get_transaction_by_date(
         get_transaction_data: GetTransaction,
         session: AsyncSession = Depends(get_async_session)
     ):
-    
-    stmt = select(transaction).where(transaction.c.wallet_id == get_transaction_data.wallet_id, transaction.c.date.between(get_transaction_data.start.replace(tzinfo=None), get_transaction_data.end.replace(tzinfo=None)))
-    
-    data = (await session.execute(stmt)).all()
-    res: list[ReadTransaction] = []
-    
-    for item in data:
-        res.append(ReadTransaction(
-            id=item[0],
-            title=item[3],
-            category_id=item[2],
-            wallet_id=item[1],
-            amount=item[4],
-            date=item[5]
-        ))
-
+    res = await transaction_by_date(get_transaction_data, session)
     return res
+    
+
+async def transaction_by_date(
+    get_transaction_data: GetTransaction,
+    session: AsyncSession = Depends(get_async_session)
+):
+    
+    try:
+        stmt = select(transaction).where(transaction.c.wallet_id == get_transaction_data.wallet_id, transaction.c.date.between(get_transaction_data.start.replace(tzinfo=None), get_transaction_data.end.replace(tzinfo=None)))
+        
+        data = (await session.execute(stmt)).all()
+        res: list[ReadTransaction] = []
+        
+        for item in data:
+            res.append(ReadTransaction(
+                id=item[0],
+                title=item[3],
+                category_id=item[2],
+                wallet_id=item[1],
+                amount=item[4],
+                date=item[5]
+            ))
+
+            return res
+    
+    except Exception:
+        raise HTTPException(
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail = SERVER_ERROR_SOMETHING_WITH_THE_DATA
+        )
+
 
 @transaction_router.post(
     "/get_by_id",

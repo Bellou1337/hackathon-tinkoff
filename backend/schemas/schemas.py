@@ -98,3 +98,6 @@ class ReadWallet(BaseModel):
 
 class WhalletId(BaseModel):
     id: int
+
+class GeminiResponse(BaseModel):
+    detail: str

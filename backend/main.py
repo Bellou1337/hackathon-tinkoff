@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import wallet
+from .routers import wallet, gemini
 
 from .routers import auth_router
 
@@ -33,6 +33,10 @@ app.include_router(
 
 app.include_router(
     wallet.router
+)
+
+app.include_router(
+    gemini.transaction_router
 )
 
 @app.get('/')
