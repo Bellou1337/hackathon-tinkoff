@@ -7,8 +7,6 @@ import redis
 import google.generativeai as genai
 import smtplib
 
-from .details import *
-
 # celery -A mycelery worker -P solo -l info
 # celery -A mycelery flower
 
