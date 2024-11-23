@@ -57,3 +57,12 @@ class NewWallet(BaseModel):
     name: str
     balance: float | None = None
     user_id: int
+    
+class RemoveWallet(BaseModel):
+    id: int
+    
+class UpdateWallet(BaseModel):
+    id: int
+    name: str | None = None
+    balance: float | None = None    
+    user_id: int | None = None

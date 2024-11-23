@@ -7,7 +7,7 @@ from ...database import get_async_session
 from ...models import user, category, wallet, transaction 
 from ...schemas import NewCategory, ResponseDetail, ReadCategory, UpdateCategory
 from ...dependencies import current_user
-from typing import Dict
+from typing import Dict, List
 from ...details import *
 
 category_router = APIRouter(
@@ -153,14 +153,24 @@ async def get_category(
 
 
 @category_router.post(
-    "/update"
+    "/update",
+    responses={
+        200: {"model": ResponseDetail, "detail": OK},
+        400: {
+            "description": "Bad Request",
+            "content": {
+                "application/json": {
+                    "example": {"detail": CATEGORY_NOT_FOUND}
+                }
+            }
+        }
+    }
 )
 async def update_category(
         category_data: UpdateCategory = Body(embed=True),
         session: AsyncSession = Depends(get_async_session)
     ):
 
-    print(category_data)
     
     stmt = update(category).where(category.c.id == category_data.id)
 
@@ -173,4 +183,54 @@ async def update_category(
     await session.execute(stmt)
     await session.commit()
 
-    return {}
+    return {"detail": OK}
+
+
+
+@category_router.get(
+    "/get_all",
+    responses={
+        200: {"model": List[NewCategory]},
+        404: {
+            "description": "Bad Request",
+            "content": {
+                "application/json": {
+                    "example": {"detail": CATEGORY_NOT_FOUND}
+                }
+            }
+        },
+        500: {
+            "description": "Internal Server Error",
+            "content": {
+                "application/json": {
+                    "example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}
+                }
+            }
+        }
+    }
+)
+async def get_all_category(
+        session: AsyncSession = Depends(get_async_session)
+    ):
+
+    try:
+        stmt = select(category.c.name, category.c.is_income)
+        
+        result = await session.execute(stmt)
+        rows = result.all()
+        
+        if not rows:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=CATEGORY_NOT_FOUND
+            )
+        
+        return [
+            NewCategory(
+                name = row[0],
+                is_income = row[1]
+            ) for row in rows
+        ]
+    
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=SERVER_ERROR_SOMETHING_WITH_THE_DATA)
