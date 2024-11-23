@@ -66,3 +66,23 @@ class UpdateWallet(BaseModel):
     name: str | None = None
     balance: float | None = None    
     user_id: int | None = None
+
+class UpdateTransaction(BaseModel):
+    id: int
+    title: str | None = None
+    category_id: int | None = None
+    amount: float | None = None
+    date: datetime | None = None
+
+class ReadTransaction(BaseModel):
+    id: int
+    title: str
+    category_id: int
+    wallet_id: int
+    amount: float
+    date: datetime
+
+class GetTransaction(BaseModel):
+    wallet_id: int
+    start: datetime
+    end: datetime

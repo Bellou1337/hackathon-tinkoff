@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import update, select, insert, delete
 from ...database import get_async_session
 from ...models import transaction, category, wallet
-from ...schemas import NewTransaction, ResponseDetail
+from ...schemas import NewTransaction, ResponseDetail, UpdateTransaction, GetTransaction, ReadTransaction
 from ...dependencies import current_user
 from typing import Dict
 from ...details import *
@@ -140,57 +140,169 @@ async def remove_transaction(
     
     return {"detail" : OK}
 
-# @category_router.post(
-#     "/get",
-#     responses={
-#         200: {"model": ReadCategory},
-#         404: {
-#             "description": "Bad Request",
-#             "content": {
-#                 "application/json": {
-#                     "example": {"detail": CATEGORY_NOT_FOUND}
-#                 }
-#             }
-#         }
-#     }
-# )
-# async def get_category(
-#         category_id: int = Body(embed=True),
-#         session: AsyncSession = Depends(get_async_session)
-#     ):
+@transaction_router.post(
+    "/get_by_date",
+    responses={
+        200: {"model": list[ReadTransaction]}
+    }
+)
+async def get_transaction_by_date(
+        get_transaction_data: GetTransaction,
+        session: AsyncSession = Depends(get_async_session)
+    ):
     
-#     stmt = select(category).where(category.c.id == category_id)
+    stmt = select(transaction).where(transaction.c.wallet_id == get_transaction_data.wallet_id, transaction.c.date.between(get_transaction_data.start.replace(tzinfo=None), get_transaction_data.end.replace(tzinfo=None)))
     
-#     result = (await session.execute(stmt)).first()
+    data = (await session.execute(stmt)).all()
+    res: list[ReadTransaction] = []
     
-#     if not result:
-#         raise HTTPException(
-#             status_code= status.HTTP_404_NOT_FOUND,
-#             detail=CATEGORY_NOT_FOUND,   
-#         )
+    for item in data:
+        res.append(ReadTransaction(
+            id=item[0],
+            title=item[3],
+            category_id=item[2],
+            wallet_id=item[1],
+            amount=item[4],
+            date=item[5]
+        ))
 
-#     return ReadCategory(id=result[0], name=result[1], is_income=result[2])
+    return res
 
-
-# @category_router.post(
-#     "/update"
-# )
-# async def update_category(
-#         category_data: UpdateCategory = Body(embed=True),
-#         session: AsyncSession = Depends(get_async_session)
-#     ):
-
-#     print(category_data)
+@transaction_router.post(
+    "/get_by_id",
+    responses={
+        200: {"model": ReadTransaction},
+        404: {
+            "description": "Bad Request",
+            "content": {
+                "application/json": {
+                    "example": {"detail": TRANSACTION_NOT_FOUND}
+                }
+            }
+        }
+    }
+)
+async def get_transaction_by_id(
+        transaction_id: int = Body(embed=True),
+        session: AsyncSession = Depends(get_async_session)
+    ):
     
-#     stmt = update(category).where(category.c.id == category_data.id)
-
-#     if category_data.name is not None:
-#         stmt = stmt.values(name=category_data.name)
-
-#     if category_data.is_income is not None:
-#         stmt = stmt.values(is_income=category_data.is_income)
+    stmt = select(transaction).where(transaction.c.id == transaction_id)
     
-#     await session.execute(stmt)
-#     await session.commit()
+    item = (await session.execute(stmt)).fetchone()
 
-#     return {}
+    if item is None:
+        raise HTTPException(
+            status_code = status.HTTP_400_BAD_REQUEST,
+            detail = TRANSACTION_NOT_FOUND
+        )
+    
+    return ReadTransaction(
+            id=item[0],
+            title=item[3],
+            category_id=item[2],
+            wallet_id=item[1],
+            amount=item[4],
+            date=item[5]
+        )
+
+@transaction_router.post(
+    "/update"
+)
+async def update_transaction(
+        trasaction_data: UpdateTransaction = Body(embed=True),
+        session: AsyncSession = Depends(get_async_session)
+    ):
+    
+    stmt = select(transaction.c.amount, transaction.c.category_id, transaction.c.wallet_id).where(transaction.c.id == trasaction_data.id)
+    old_transaction_data = (await session.execute(stmt)).fetchone()
+
+    if old_transaction_data is None:
+        raise HTTPException(
+            status_code = status.HTTP_400_BAD_REQUEST,
+            detail = TRANSACTION_NOT_FOUND
+        )
+
+    old_amount, old_category_id, wallet_id = old_transaction_data
+
+    stmt = update(transaction).where(transaction.c.id == trasaction_data.id)
+
+    query = select(category.c.is_income).where(category.c.id == old_category_id)
+    old_category_is_income = (await session.execute(query)).fetchone()
+
+    if old_category_is_income is None:
+        raise HTTPException(
+            status_code = status.HTTP_400_BAD_REQUEST,
+            detail = CATEGORY_NOT_FOUND
+        )
+
+    old_category_is_income = old_category_is_income[0]
+    new_category_is_income = old_category_is_income
+
+    if trasaction_data.category_id is not None:
+        query = select(category.c.is_income).where(category.c.id == trasaction_data.category_id)
+        new_category_is_income = (await session.execute(query)).fetchone()
+
+        if new_category_is_income is None:
+            raise HTTPException(
+                status_code = status.HTTP_400_BAD_REQUEST,
+                detail = CATEGORY_NOT_FOUND
+            )
+
+        new_category_is_income = new_category_is_income[0]
+
+    if trasaction_data.title is not None:
+        stmt = stmt.values(title=trasaction_data.title)
+    
+    if trasaction_data.date is not None:
+        stmt = stmt.values(date=trasaction_data.date.replace(tzinfo=None))
+    
+    if old_category_is_income != new_category_is_income and trasaction_data.amount is not None:
+        new_amount = abs(trasaction_data.amount) + abs(old_amount)
+
+        if not new_category_is_income:
+            new_amount = -new_amount
+
+        query = (
+            update(wallet)
+            .where(wallet.c.id == wallet_id)
+            .values(balance=wallet.c.balance + new_amount)
+        )
+        
+        await session.execute(query)
+
+        stmt = stmt.values(category_id=trasaction_data.category_id)
+        stmt = stmt.values(amount=trasaction_data.amount)
+
+    elif old_category_is_income != new_category_is_income:
+        if not old_category_is_income:
+            old_amount = -old_amount
+
+        query = (
+            update(wallet)
+            .where(wallet.c.id == wallet_id)
+            .values(balance=wallet.c.balance - old_amount * 2)
+        )
+        await session.execute(query)
+
+        stmt = stmt.values(category_id=trasaction_data.category_id)
+        
+    elif trasaction_data.amount is not None:
+        new_amount = abs(trasaction_data.amount) - abs(old_amount)
+        if not new_category_is_income:
+            new_amount = -new_amount
+
+        query = (
+            update(wallet)
+            .where(wallet.c.id == wallet_id)
+            .values(balance=wallet.c.balance + new_amount)
+        )
+        
+        await session.execute(query)
+        stmt = stmt.values(amount=trasaction_data.amount)
+
+    
+    await session.execute(stmt)
+    await session.commit()
+
+    return {"detail" : OK}
