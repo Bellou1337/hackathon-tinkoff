@@ -9,7 +9,7 @@ from ...schemas import NewTransaction, ResponseDetail, UpdateTransaction, GetTra
 from ...dependencies import current_user
 from typing import Dict
 from ...details import *
-from .wallet import check_ownership_wallet, check_can_read_wallet
+from .wallet import check_ownership_wallet, check_can_read_wallet, transaction_by_date
 from ...dependencies import current_user, current_superuser
 
 transaction_router = APIRouter(
@@ -175,28 +175,6 @@ async def get_transaction_by_date(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=USER_PERMISSION_ERROR)
 
     res = await transaction_by_date(get_transaction_data, session)
-    return res
-    
-
-async def transaction_by_date(
-    get_transaction_data: GetTransaction,
-    session: AsyncSession = Depends(get_async_session)
-):        
-    stmt = select(transaction).where(transaction.c.wallet_id == get_transaction_data.wallet_id, transaction.c.date.between(get_transaction_data.start.replace(tzinfo=None), get_transaction_data.end.replace(tzinfo=None)))
-    
-    data = (await session.execute(stmt)).all()
-    res: list[ReadTransaction] = []
-    
-    for item in data:
-        res.append(ReadTransaction(
-            id=item[0],
-            title=item[3],
-            category_id=item[2],
-            wallet_id=item[1],
-            amount=item[4],
-            date=item[5]
-        ))
-
     return res
 
 

@@ -1,20 +1,43 @@
-from fastapi import Body, APIRouter, Depends, HTTPException, status
+from fastapi import Body, APIRouter, Depends, HTTPException, status, Response
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import update, select, insert, delete
 from ...database import get_async_session
-from ...models import user, wallet, transaction 
-from ...schemas import NewWallet, ResponseDetail, RemoveWallet,UpdateWallet, UserWalletId, ReadWallet, WhalletId, UserRead, NewWalletByUserId
+from ...models import user, wallet, transaction, category
+from ...schemas import NewWallet, ResponseDetail, RemoveWallet,UpdateWallet, UserWalletId, ReadWallet, WhalletId, UserRead, NewWalletByUserId, GetTransaction, ReadTransaction
 from ...dependencies import current_user
 from typing import List
 from ...details import *
 from ...dependencies import current_user, current_superuser
 
+from fpdf import FPDF
+
 wallet_router = APIRouter(
     prefix = "/wallet",
     tags = ["wallet"]
 )
+
+async def transaction_by_date(
+    get_transaction_data: GetTransaction,
+    session: AsyncSession = Depends(get_async_session)
+):        
+    stmt = select(transaction).where(transaction.c.wallet_id == get_transaction_data.wallet_id, transaction.c.date.between(get_transaction_data.start.replace(tzinfo=None), get_transaction_data.end.replace(tzinfo=None)))
+    
+    data = (await session.execute(stmt)).all()
+    res: list[ReadTransaction] = []
+    
+    for item in data:
+        res.append(ReadTransaction(
+            id=item[0],
+            title=item[3],
+            category_id=item[2],
+            wallet_id=item[1],
+            amount=item[4],
+            date=item[5]
+        ))
+
+    return res
 
 async def check_ownership_wallet(wallet_id: int, user_id, session: AsyncSession) -> bool:
     stmt = select(wallet.c.user_id).where(wallet.c.id == wallet_id)
@@ -299,9 +322,72 @@ async def get_wallet_by_id(wallet_data: WhalletId, session: AsyncSession = Depen
         user_id=row[1]
     )
 
-    owner = row[1]
-
     if user.is_superuser or (await check_can_read_wallet(wallet_data.id, user.id, session)):
         return res
     
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=USER_PERMISSION_ERROR)
+
+@wallet_router.post(
+    "/pdf_generate",
+    responses={
+        200: {"model": ReadWallet, "description": "Successfully retrieved wallet"},
+        404: {"description": "Not Found", "content": {"application/json": {"example": {"detail": WALLET_NOT_FOUND}}}},
+        500: {"description": "Internal Server Error", "content": {"application/json": {"example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}}}}
+    }
+)
+async def get_wallet_pdf(wallet_data: GetTransaction, session: AsyncSession = Depends(get_async_session), user: UserRead = Depends(current_user)):
+       
+    if not (user.is_superuser or (await check_can_read_wallet(wallet_data.wallet_id, user.id, session))):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=USER_PERMISSION_ERROR)
+    
+    data = await transaction_by_date(wallet_data, session)
+
+    category_ids = []
+    for i in data:
+        if i.category_id not in category_ids:
+            category_ids.append(i.category_id)
+
+    stmt = select(category.c.id, category.c.name).where(category.c.id.in_(category_ids))
+    category_datas = (await session.execute(stmt)).all()
+
+    categories = {}
+    for i in category_datas:
+        categories[i[0]] = i[1]
+
+    head = ("Название", "Категория", "Сумма", "Дата")
+
+    pdf = FPDF()
+    pdf.add_page()
+
+    pdf.add_font("DejaVu", '', 'DejaVuSans.ttf')
+    pdf.add_font("DejaVu", "B", "DejaVuSans-Bold.ttf")
+
+    pdf.set_font("DejaVu", size=12)
+
+    stmt = select(wallet.c.name).where(wallet.c.id == wallet_data.wallet_id)
+    wallet_name = (await session.execute(stmt)).first()
+
+    pdf.write(text=wallet_name[0])
+    pdf.ln()
+    pdf.ln()
+
+    with pdf.table(cell_fill_color=200, cell_fill_mode="ROWS") as table:
+        row = table.row()
+        for datum in head:
+            row.cell(datum)
+            
+        for data_row in data:
+            row = table.row()
+
+            row.cell(str(data_row.title))
+            row.cell(str(categories[data_row.category_id]))
+            row.cell(str(data_row.amount))
+            row.cell(str(data_row.date.strftime("%d.%m.%Y %H:%M")))
+
+
+    filename = "table.pdf"
+    headers = {
+        "Content-Disposition": f"attachment; filename={filename}"
+    }
+
+    return Response(content=bytes(pdf.output()), media_type="application/pdf", headers=headers)
