@@ -106,7 +106,7 @@ const date = ref('12.05.2005');
         <p class="text-3xl border-b-2 border-black dark:border-white dark:text-white pb-5">Баланс руб.</p>
     </div>
 
-    <div class=" max-h-screen mt-16 md:mt-20 min-h-96 md:w-1/2 w-full md:m-5 overflow-y-auto flex flex-col items-center mb-10">
+    <div class=" max-h-screen mt-5 min-h-96 md:w-1/2 w-full md:m-5 overflow-y-auto flex flex-col items-center mb-10">
       <!-- Увеличиваем отступ сверху, чтобы липкий элемент не перекрывал содержимое -->
       <div class="sticky top-0 bg-yellow-300/50 dark:bg-yellow-500/90 text-xl text-center rounded-md w-48 z-10 mb-4">{{ date }}</div>
       <div class="w-full flex flex-col items-center">
