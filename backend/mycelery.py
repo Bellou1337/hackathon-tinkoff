@@ -7,7 +7,13 @@ from email.message import EmailMessage
 # celery -A mycelery worker -P solo -l info
 # celery -A mycelery flower
 
-app = Celery('mycelery', broker='redis://IP/0')
+if __name__ == "mycelery":
+    from config import config
+else:
+    from .config import config
+
+broker = f'{config["Redis"]["host"]}:{config.get("Redis", "port")}'
+app = Celery('mycelery', broker=f'redis://{broker}/0')
 app.conf.broker_connection_retry_on_startup = True
 
 @app.task(name='mycelery.send_text_mail_task')
