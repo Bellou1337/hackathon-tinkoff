@@ -8,7 +8,7 @@ import google.generativeai as genai
 
 import smtplib
 from email.message import EmailMessage
-
+from .details import *
 
 # celery -A mycelery worker -P solo -l info
 # celery -A mycelery flower
@@ -43,21 +43,31 @@ def prompt_sender(prompt: str, key):
             if response and hasattr(response, 'text'):
                     result = response.text
                     redis_db.set(key, result, 172_800)
-                    return {"detail " : result}
+                    break
 
             time.sleep(MAX_DELAY)
         
-        raise HTTPException(
+        redis_data = redis_db.get(key).decode('utf-8')
+        
+        print(redis_data) 
+        
+        if redis_data == "-1":
+            redis_db.set(key,None)
+            raise HTTPException(
                 status_code = status.HTTP_404_NOT_FOUND,
                 detail = API_ERROR_SOMETHING_WITH_THE_DATA
             )
+            
+        return {"detail" : OK}        
         
-    except HTTPException:
+    except HTTPException as e:
+        print(e)
         raise HTTPException(
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail = API_ERROR_SOMETHING_WITH_THE_DATA
         )
-    except Exception:
+    except Exception as e:
+        print(e)
         raise HTTPException(
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail = API_ERROR_SOMETHING_WITH_THE_DATA

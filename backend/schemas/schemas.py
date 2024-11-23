@@ -101,3 +101,6 @@ class WhalletId(BaseModel):
 
 class GeminiResponse(BaseModel):
     detail: str
+
+class GetGeminiRecomendation(BaseModel):
+    wallet_id: int
