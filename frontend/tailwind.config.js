@@ -14,6 +14,7 @@ export default {
         'slight-yellow': '#fff4bc',
         'slight-black': '#313232',
         'auth-gray': '#757373',
+        'primary-yellow': '#facc15',
       },
     },
   },

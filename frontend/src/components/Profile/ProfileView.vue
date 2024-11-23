@@ -1,19 +1,21 @@
 <script setup>
+import { ref } from 'vue'
+
 import UserInfoView from '@/components/profile/information/UserInfoView.vue'
 import MoneyView from '@/components/profile/information/MoneyView.vue'
 import WalletsView from '@/components/profile/information/wallets/WalletsView.vue'
+
+const name = ref('user')
+const email = ref('user@example.com')
 </script>
 
 <template>
-  <div class="dark:bg-neutral-800 bg-slight-gray flex flex-col px-5 min-h-screen">
-    <div class="dark:text-white border-b-2 border-black dark:border-white pb-5">
-      <UserInfoView />
-      <div
-        class="flex flex-col sm:flex-col md:flex-row lg:flex-row items-center justify-center gap-5"
-      >
-        <MoneyView class="lg:w-2/3 w-full" />
-        <WalletsView class="lg:w-1/3 w-full" />
-      </div>
+  <div class="md:my-16 my-8 max-w-screen-xl mx-auto flex flex-col justify-center">
+    <div class="flex md:flex-row flex-col mb-8">
+      <div class="md:w-1/2 w-full"><UserInfoView /></div>
+      <div class="md:w-1/2 w-full"><WalletsView /></div>
     </div>
+
+    <MoneyView />
   </div>
 </template>
