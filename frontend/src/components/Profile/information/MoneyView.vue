@@ -1,7 +1,7 @@
 <template>
-    <div class="flex items-center justify-center lg:gap-10 gap-5 dark:bg-neutral-200 dark:rounded-lg">
+    <div class="">
       <!--Либо график либо те карточки оставляем-->
-        <div class=" ">
+        <div class=" flex items-center justify-center bg-white my-2 shadow-xl lg:gap-10 gap-5 dark:bg-neutral-200 rounded-lg p-5">
           <!-- Передаем данные и настройки через props -->
           <digr :data="chartData" :options="chartOptions" />
         </div>
@@ -52,8 +52,8 @@ const chartData = {
     {
       label: 'Доходы-Расходы',
       data: [7000, 3000], //изменяемое значение (брать из бека)
-      backgroundColor: ['#42d457', '#d44242'],
-      hoverBackgroundColor: ['#20d457', '#c44242']
+      backgroundColor: ['#FFE041', '##292929'],
+      hoverBackgroundColor: ['#ffe45c', '#171717']
     }
   ]
 }

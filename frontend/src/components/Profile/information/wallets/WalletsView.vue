@@ -43,11 +43,12 @@ const Wallets = ref([
 </script>
 
 <template>
-  <div class="flex flex-col gap-5 items-center">
-      <div class=" h-full grid grid-cols-3 gap-3 min-w-56 justify-items-center">
+  <div class="flex flex-col items-center gap-5">
+    <p class=" text-3xl">Текущие кошельки</p>
+      <div class="  rounded-lg max-h-[10rem] mt-5 min-h-80 w-full overflow-y-auto scrollbar flex flex-col items-center justify-center mb-2">
       <wallet v-for="wallet in Wallets" 
       key="index"
-      class="my-5"
+      class="my-1"
       :Naming=wallet.naming
       :countOfMoney = wallet.countOfMoney
       :banknote = wallet.banknote
