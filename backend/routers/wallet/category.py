@@ -151,6 +151,42 @@ async def get_category(
 
     return ReadCategory(id=result[0], name=result[1], is_income=result[2])
 
+@category_router.post(
+    "/get_list",
+    responses={
+        200: {"model": list[ReadCategory]},
+        404: {
+            "description": "Bad Request",
+            "content": {
+                "application/json": {
+                    "example": {"detail": CATEGORY_NOT_FOUND}
+                }
+            }
+        }
+    }
+)
+async def get_category_list(
+        category_ids: list[int] = Body(embed=True),
+        session: AsyncSession = Depends(get_async_session)
+    ):
+    
+    stmt = select(category).where(category.c.id.in_(category_ids))
+
+    result = (await session.execute(stmt)).all()
+    
+    if not result:
+        raise HTTPException(
+            status_code= status.HTTP_404_NOT_FOUND,
+            detail=CATEGORY_NOT_FOUND,   
+        )
+
+    res: list[ReadCategory] = []
+
+    for item in result:
+        res.append(ReadCategory(id=item[0], name=item[1], is_income=item[2]))
+
+    return res
+
 
 @category_router.post(
     "/update",
