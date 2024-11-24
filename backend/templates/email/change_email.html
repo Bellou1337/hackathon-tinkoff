@@ -4,25 +4,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Email Template</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f6f7f8; font-family: Arial, sans-serif; line-height: 1.5;">
+<body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f6f7f8; padding: 3rem;">
 
-  <table width="100%" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-spacing: 0; border-collapse: collapse; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-    <tr>
-      <td style="text-align: center; padding: 20px;">
-        <h1 style="font-size: 24px; margin-bottom: 20px; color: #333333;">Смена почты {{ username }}</h1>
-        <p style="font-size: 16px; color: #555555; margin-bottom: 20px;">Мы отправили это письмо, так как запросили смену почты. Нажмите на ссылку ниже, чтобы изменить почту.</p>
-        <hr style="border: none; border-top: 1px solid #dddddd; margin: 20px 0;">
-        
-        <a href="{{ token }}" style="background-color: #ffe044; color: #000000; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; display: inline-block; font-size: 16px; margin: 20px 0;">Перейти</a>
-        
-        <p style="font-size: 16px; color: #555555; margin-bottom: 10px;">Или пройдите по ссылке:</p>
-        {{ token }}
-        <hr style="border: none; border-top: 1px solid #dddddd; margin: 20px 0;">
-        
-        <p style="font-size: 16px; color: #555555;">Если вы не запрашивали смену почты, то просто проигнорируйте это сообщение и ваша почта не будет изменена.</p>
-      </td>
-    </tr>
-  </table>
+  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <h1 style="text-align: center; margin-bottom: 2rem; font-size: 24px; color: #333333;">
+      Смена почты {{ username }}
+    </h1>
+
+    <p style="text-align: center; font-size: 16px; color: #555555; line-height: 1.5; margin: 1rem 0;">
+      Мы отправили это письмо, так как запросили смену почты. Нажмите на ссылку ниже, чтобы изменить почту.
+    </p>
+
+    <hr style="border: none; border-top: 1px solid #dddddd; margin: 2rem 0;">
+
+    <div style="text-align: center;">
+      <a href="{{ token }}" style="display: inline-block; background-color: #ffe044; color: #000000; text-decoration: none; padding: 1rem 2rem; border-radius: 4px; font-weight: bold; font-size: 16px; margin: 2rem 0;">
+        Перейти
+      </a>
+    </div>
+
+    <p style="text-align: center; font-size: 16px; color: #555555; line-height: 1.5; margin: 1rem 0;">
+      Или пройдите по ссылке:
+    </p>
+
+    <p style="text-align: center; font-size: 16px; color: #0066cc; margin: 1rem 0;">
+      {{ token }}
+    </p>
+
+    <hr style="border: none; border-top: 1px solid #dddddd; margin: 2rem 0;">
+
+    <p style="text-align: center; font-size: 16px; color: #555555; line-height: 1.5; margin: 1rem 0;">
+      Если вы не запрашивали смену почты, то просто проигнорируйте это сообщение и ваша почта не будет изменена.
+    </p>
+  </div>
 
 </body>
 </html>
