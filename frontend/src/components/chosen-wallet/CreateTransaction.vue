@@ -15,7 +15,7 @@ const categories = ref([])
 const route = useRoute()
 const router = useRouter()
 const id = route.query.id
-const selectedOption = ref(""); 
+const selectedOption = ref('')
 
 const fetchCategories = async () => {
   try {
@@ -37,7 +37,7 @@ const fetchCategories = async () => {
       categories.value = response.data.map((category) => ({
         name: category.name,
         income: category.is_income,
-        active: false,//все false изначально
+        active: false, //все false изначально
         id: category.id,
       }))
     }
@@ -58,11 +58,11 @@ const createTransaction = async () => {
       '/transaction/add',
       {
         title: title.value,
-        category_id: selectedOption.value,//передаем выбранную категорию 
+        category_id: selectedOption.value, //передаем выбранную категорию
         amount: Math.abs(amount.value),
         wallet_id: id,
         date: date.value,
-      },	
+      },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -82,16 +82,15 @@ const createTransaction = async () => {
 onMounted(async () => {
   await fetchCategories()
 })
-//------------Функция для сброса категории----------------
+
 const selectCategory = (categoryId) => {
-  selectedOption.value = categoryId;
+  selectedOption.value = categoryId
   categories.value.forEach((category) => {
     if (category.id !== categoryId) {
-      category.active = false;  // Сбросить состояние активности других категорий
+      category.active = false
     }
-  });
+  })
 }
-
 </script>
 
 <template>
@@ -120,8 +119,8 @@ const selectCategory = (categoryId) => {
                   type="checkbox"
                   v-model="category.active"
                   :value="category.name"
-									:checked="selectedOption === category.id"
-									@change="selectCategory(category.id)"
+                  :checked="selectedOption === category.id"
+                  @change="selectCategory(category.id)"
                   class="h-4 w-4 text-green-500 border-gray-300 rounded focus:ring-green-500"
                 />
                 <span>{{ category.name }}</span>
@@ -136,7 +135,7 @@ const selectCategory = (categoryId) => {
                 type="text"
                 class="w-full rounded-lg border-gray-200 bg-gray-100 p-4 pe-12 text-sm shadow-sm transition hover:bg-gray-200"
                 placeholder="Название транзакции"
-								maxlength="20"
+                maxlength="20"
                 required
               />
             </div>
@@ -148,6 +147,7 @@ const selectCategory = (categoryId) => {
                 class="w-full rounded-lg border-gray-200 bg-gray-100 p-4 pe-12 text-sm shadow-sm transition hover:bg-gray-200"
                 placeholder="Сумма"
                 required
+                style="-webkit-appearance: none; -moz-appearance: textfield; appearance: none"
               />
             </div>
           </div>
@@ -169,3 +169,16 @@ const selectCategory = (categoryId) => {
     </div>
   </div>
 </template>
+
+<style>
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+</style>
