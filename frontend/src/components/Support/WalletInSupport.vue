@@ -1,20 +1,23 @@
 <script setup>
 import { useRouter } from 'vue-router'
 
-defineProps({
+const emit = defineEmits(['analyze'])
+
+const props = defineProps({
   name: String,
   amount: Number,
   currency: String,
+  id: Number,
 })
 
 const router = useRouter()
 
 const navigateToWallet = () => {
-  router.push('/profile/wallet')
+  router.push(`/profile/wallet?id=${props.id}`)
 }
 
 const handleClick = () => {
-  // TODO: анализ с бэкенда
+  emit('analyze', { walletId: props.id })
 }
 </script>
 

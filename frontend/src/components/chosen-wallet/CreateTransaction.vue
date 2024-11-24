@@ -1,65 +1,157 @@
 <script setup>
-import {ref} from 'vue'
+import { ref, onMounted } from 'vue'
+import { getCookie } from '@/utils/cookies'
+import { useRoute, useRouter } from 'vue-router'
+import apiClient from '@/services'
 
+const title = ref('')
+const amount = ref('')
+const date = ref('')
 
 const dropdownOpen = ref(false)
 
-const categories = ref([
-  {
-    flag: true,
-    value: 'wwwww',
-  },
-])
+const categories = ref([])
+
+const route = useRoute()
+const router = useRouter()
+const id = route.query.id
+
+const fetchCategories = async () => {
+  try {
+    const token = await getCookie('auth_token')
+
+    if (!token) {
+      throw new Error('Token not found')
+    }
+
+    const response = await apiClient.get('/category/get_all', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    if (response.status === 200) {
+      // console.log(response.data)
+
+      categories.value = response.data.map((category) => ({
+        name: category.name,
+        income: category.is_income,
+        active: true,
+        id: category.id,
+      }))
+    }
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+const createTransaction = async () => {
+  try {
+    const token = await getCookie('auth_token')
+
+    if (!token) {
+      throw new Error('Token not found')
+    }
+
+    const response = await apiClient.post(
+      '/transaction/add',
+      {
+        title: title.value,
+        category_id: 10,
+        amount: Math.abs(amount.value),
+        wallet_id: id,
+        date: date.value,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+
+    if (response.status === 200) {
+      // console.log(response.data)
+      router.push(`/profile/wallet?id=${id}`)
+    }
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+onMounted(async () => {
+  await fetchCategories()
+})
 </script>
 
 <template>
-    <div class=" bg-slight-gray min-h-[calc(100vh-80px)] p-5 flex items-center justify-center">
-        <div class="bg-white shadow rounded p-16">
-            <p class="text-3xl font-bold text-slight-black text-center mb-10">Новая транзакция</p>
-            <div class="flex sm:flex-row flex-col gap-10">
-                <div class="flex flex-col ">
-                    <div class="my-10">
-                        <p class="text-lg mb-5">Категория</p>
-                        <button
-                            @click="dropdownOpen = !dropdownOpen"
-                            class="inline-block rounded-lg w-full bg-yellow-300 px-5 py-3 text-sm font-medium transition hover:bg-yellow-400"
-                        >
-                            Выберите категории
-                        </button>
-                        <div
-                            v-show="dropdownOpen"
-                            class="absolute mt-2 w-48 bg-white border rounded-lg shadow-lg z-10 p-2"
-                        >
-                            <label
-                            v-for="(category, index) in categories"
-                            :key="index"
-                            class="flex items-center space-x-2"
-                            >
-                            <input
-                                type="checkbox"
-                                v-model="category.flag"
-                                :value="category.value"
-                                class="h-4 w-4 text-green-500 border-gray-300 rounded focus:ring-green-500"
-                            />
-                            <span>{{ category.value }}</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div>
-                        <p class="text-lg mb-5">Откуда/Куда</p>
-                        <input class="w-full rounded-lg border-gray-200 bg-gray-100 p-4 pe-12 text-sm shadow-sm transition hover:bg-gray-200" type="text">
-                    </div>
-                    <div>
-                        <p class="text-lg mb-5">Сумма</p>
-                        <input class="w-full rounded-lg border-gray-200 bg-gray-100 p-4 pe-12 text-sm shadow-sm transition hover:bg-gray-200" type="text">
-                    </div>
-                </div>
-                <div class="bg-gray-200 p-5 my-10 h-32 rounded shadow ">
-                    <p class="text-lg mb-5">Дата и время</p>
-                    <input class="rounded text-center" type="date"></input>
-                </div>
+  <div class="bg-slight-gray min-h-[calc(100vh-80px)] p-5 flex items-center justify-center">
+    <div class="bg-white shadow rounded p-16">
+      <p class="text-3xl font-bold text-slight-black text-center mb-8">Новая транзакция</p>
+      <div class="flex sm:flex-row flex-col gap-10 mb-4">
+        <div class="flex flex-col">
+          <div class="mb-8">
+            <button
+              @click="dropdownOpen = !dropdownOpen"
+              class="inline-block rounded-lg w-full bg-yellow-300 px-5 py-3 text-sm font-medium transition hover:bg-yellow-400"
+            >
+              Выберите категории
+            </button>
+            <div
+              v-show="dropdownOpen"
+              class="absolute mt-2 w-56 bg-white border rounded-lg shadow-lg z-10 p-2"
+            >
+              <label
+                v-for="(category, index) in categories"
+                :key="index"
+                class="flex items-center space-x-2"
+              >
+                <input
+                  type="checkbox"
+                  v-model="category.active"
+                  :value="category.name"
+                  class="h-4 w-4 text-green-500 border-gray-300 rounded focus:ring-green-500"
+                />
+                <span>{{ category.name }}</span>
+              </label>
             </div>
- 
+          </div>
+
+          <div class="flex flex-col gap-4">
+            <div class="relative">
+              <input
+                v-model="title"
+                type="text"
+                class="w-full rounded-lg border-gray-200 bg-gray-100 p-4 pe-12 text-sm shadow-sm transition hover:bg-gray-200"
+                placeholder="Название транзакции"
+                required
+              />
+            </div>
+
+            <div class="relative">
+              <input
+                v-model="amount"
+                type="number"
+                class="w-full rounded-lg border-gray-200 bg-gray-100 p-4 pe-12 text-sm shadow-sm transition hover:bg-gray-200"
+                placeholder="Сумма"
+                required
+              />
+            </div>
+          </div>
         </div>
+        <div class="bg-gray-200 p-5 my-10 h-32 rounded shadow">
+          <p class="text-lg font-bold mb-2 text-center">Дата</p>
+          <input v-model="date" class="rounded text-center" type="date" />
+        </div>
+      </div>
+
+      <div class="flex">
+        <button
+          @click="createTransaction"
+          class="inline-block rounded-lg w-full mx- bg-yellow-300 px-5 py-3 text-sm font-medium transition hover:bg-yellow-400"
+        >
+          Создать
+        </button>
+      </div>
     </div>
+  </div>
 </template>

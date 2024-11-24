@@ -22,8 +22,10 @@
     <div class="w-full lg:w-1/3 flex-col sm:flex-row lg:flex-col flex mb-4 gap-8">
       <div class="w-full bg-gray-200 shadow-lg h-full rounded flex flex-col items-center">
         <div class="text-slight-black px-4 py-8 text-center flex flex-col gap-3">
-          <router-link class="text-lg md:text-2xl sm:text-xl font-bold hover:underline cursor-pointer" 
-          to="/support" >
+          <router-link
+            class="text-lg md:text-2xl sm:text-xl font-bold hover:underline cursor-pointer"
+            to="/support"
+          >
             Помощник
           </router-link>
           <p class="md:text-md text-sm">Лисёнок, помогающий с финансами</p>
@@ -34,7 +36,11 @@
 
       <div class="w-full bg-gray-200 shadow-lg h-full rounded flex flex-col items-center">
         <div class="text-slight-black px-4 py-8 text-center flex flex-col gap-3">
-          <h1 class="text-lg md:text-2xl font-bold hover:underline cursor-pointer">Кошелёк</h1>
+          <router-link
+            class="text-lg md:text-2xl font-bold hover:underline cursor-pointer"
+            to="/profile"
+            >Кошелёк</router-link
+          >
           <p class="md:text-md text-sm">Удобное управление деньгами</p>
         </div>
 

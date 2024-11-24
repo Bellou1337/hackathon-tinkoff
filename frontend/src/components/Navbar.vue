@@ -1,24 +1,22 @@
 <script>
-import { ref } from 'vue'
-import { getCookie } from '@/utils/cookies'
+import { ref, onMounted } from 'vue'
+import { useAuth } from '@/composables/useAuth'
 
 export default {
   setup() {
     const isDropdownOpen = ref(false)
+    const { loggedIn, isLoading, logout } = useAuth()
 
     const toggleDropdown = () => {
       isDropdownOpen.value = !isDropdownOpen.value
     }
 
-    const isLoggedIn = () => {
-      // return getCookie('auth_token') !== undefined
-      true
-    }
-
     return {
       isDropdownOpen,
       toggleDropdown,
-      isLoggedIn,
+      loggedIn,
+      isLoading,
+      logout,
     }
   },
 }
@@ -64,12 +62,20 @@ export default {
             </router-link>
 
             <router-link
-              v-if="!isLoggedIn()"
+              v-if="!loggedIn && !isLoading"
               class="block rounded-md bg-yellow-300 px-5 py-2.5 text-sm font-medium text-slight-black transition hover:bg-yellow-400"
               to="/auth/login"
             >
               Войти
             </router-link>
+
+            <button
+              v-if="loggedIn && !isLoading"
+              @click="logout"
+              class="block rounded-md bg-yellow-300 px-5 py-2.5 text-sm font-medium text-slight-black transition hover:bg-yellow-400"
+            >
+              Выйти
+            </button>
           </div>
 
           <div class="relative sm:hidden">
@@ -121,6 +127,7 @@ export default {
                   </router-link>
 
                   <router-link
+                    v-if="!loggedIn"
                     to="/auth/login"
                     class="block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                     role="menuitem"

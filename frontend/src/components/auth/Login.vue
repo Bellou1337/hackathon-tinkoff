@@ -1,5 +1,6 @@
 <script>
 import { ref, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import apiClient from '@/services'
 import { getCookie } from '@/utils/cookies'
 
@@ -9,6 +10,7 @@ export default {
     const password = ref('')
     const isPasswordVisible = ref(false)
     const errorMessage = ref('')
+    const router = useRouter()
 
     const togglePasswordVisibility = () => {
       isPasswordVisible.value = !isPasswordVisible.value
@@ -60,6 +62,7 @@ export default {
           console.log('Авторизация прошла успешно!')
 
           document.cookie = `auth_token=${response.data.access_token}; path=/;`
+          router.push('/')
           return
         } else {
           messageType.value = MessageTypeEnum.LOGIN_FAILED

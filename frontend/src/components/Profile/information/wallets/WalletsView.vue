@@ -25,7 +25,7 @@ const fetchWallets = async () => {
 
       wallets.value = response.data.map((wallet) => ({
         name: wallet.name,
-        balance: 0,
+        balance: wallet.balance,
         id: wallet.id,
         currency: 'руб.',
       }))
@@ -41,10 +41,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="mt-10 flex flex-col items-center gap-5 min-h-[calc(100vh-80px)]">
+  <div class="mt-10 flex flex-col items-center gap-5">
     <p class="text-3xl font-bold text-slight-black">Текущие кошельки</p>
     <div class="rounded-lg max-h-96 w-full pl-4 overflow-y-auto flex flex-col mb-2 scrollbar">
       <div
+        v-if="wallets.length > 0"
         class="flex flex-col w-full min-h-20 h-full rounded-xl justify-between items-center my-1"
       >
         <Wallet

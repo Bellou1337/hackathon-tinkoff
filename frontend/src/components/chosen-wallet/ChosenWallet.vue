@@ -1,7 +1,6 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, reactive } from 'vue'
 import { useRoute } from 'vue-router'
-
 import Transaction from '@/components/chosen-wallet/Transaction.vue'
 import Graph from '@/components/graphs/MoneyGraph.vue'
 import apiClient from '@/services'
@@ -10,15 +9,19 @@ import { getCookie } from '@/utils/cookies'
 const dropdownOpen = ref(false)
 const dates = ref('')
 const walletName = ref('')
+const walletBalance = ref(0)
+const incomes = ref(0)
+const expenses = ref(0)
 
 const route = useRoute()
+const id = route.query.id
 
-const chartData = {
-  names: ['Доходы', 'Расходы'],
+const chartData = computed(() => ({
+  labels: ['Доходы', 'Расходы'],
   datasets: [
     {
-      name: 'Доходы - Расходы',
-      data: [7000, 3000],
+      label: 'Доходы - Расходы',
+      data: [incomes.value, expenses.value],
       backgroundColor: ['#facc15', '#313232'],
       hoverBackgroundColor: ['#20d457', '#c44242'],
       borderColor: 'transparent',
@@ -27,7 +30,7 @@ const chartData = {
       hoverBorderWidth: 0,
     },
   ],
-}
+}))
 
 const chartOptions = {
   responsive: true,
@@ -35,7 +38,7 @@ const chartOptions = {
     legend: {
       display: true,
       position: 'top',
-      names: {
+      labels: {
         color: '#333333',
         font: {
           family: 'Geologica, sans-serif',
@@ -86,8 +89,6 @@ const fetchCategories = async () => {
     })
 
     if (response.status === 200) {
-      // console.log(response.data)
-
       categories.value = response.data.map((category) => ({
         name: category.name,
         income: category.is_income,
@@ -103,7 +104,6 @@ const fetchCategories = async () => {
 const fetchTransactions = async () => {
   try {
     const token = await getCookie('auth_token')
-    const id = route.query.id
 
     if (!token) {
       throw new Error('Token not found')
@@ -122,7 +122,8 @@ const fetchTransactions = async () => {
     )
 
     if (response.status === 200) {
-      // console.log(response.data)
+      incomes.value = 0
+      expenses.value = 0
 
       transactions.value = response.data.map((transaction) => ({
         name: transaction.title,
@@ -132,16 +133,26 @@ const fetchTransactions = async () => {
         id: transaction.id,
         category_id: transaction.category_id,
       }))
+
+      transactions.value.forEach((transaction) => {
+        const category = categories.value.find((cat) => cat.id === transaction.category_id)
+        if (category) {
+          if (category.income) {
+            incomes.value += transaction.amount
+          } else {
+            expenses.value += transaction.amount
+          }
+        }
+      })
     }
   } catch (err) {
     console.log(err)
   }
 }
 
-const fetchWalletName = async () => {
+const fetchWallet = async () => {
   try {
     const token = await getCookie('auth_token')
-    const id = route.query.id
 
     if (!token) {
       throw new Error('Token not found')
@@ -160,9 +171,8 @@ const fetchWalletName = async () => {
     )
 
     if (response.status === 200) {
-      console.log(response.data)
-
       walletName.value = response.data.name
+      walletBalance.value = response.data.balance
     }
   } catch (err) {
     console.log(err)
@@ -175,10 +185,7 @@ const filter = computed(() => {
   transactions.value.forEach((element) => {
     const dateMatch = element.date.includes(dates.value)
     const categoryMatch = categories.value.some(
-      (category) =>
-        category.active &&
-        category.income === category.income &&
-        element.category_id === category.id
+      (category) => category.active && element.category_id === category.id
     )
 
     if (dateMatch && categoryMatch) {
@@ -201,7 +208,7 @@ const convertDate = (isoDate) => {
 onMounted(async () => {
   await fetchCategories()
   await fetchTransactions()
-  await fetchWalletName()
+  await fetchWallet()
 })
 </script>
 
@@ -216,7 +223,7 @@ onMounted(async () => {
             class="flex flex-col items-center justify-center bg-white my-2 shadow-xl lg:gap-10 gap-5 rounded-lg p-5"
           >
             <Graph :data="chartData" :options="chartOptions" />
-            <p class="text-3xl font-bold text-slight-black">Баланс руб.</p>
+            <p class="text-3xl font-bold text-slight-black">{{ walletBalance }} руб.</p>
           </div>
         </div>
       </div>
@@ -225,6 +232,12 @@ onMounted(async () => {
       <div class="md:w-1/2 w-full">
         <div class="flex flex-col items-center gap-5">
           <p class="text-3xl font-bold text-slight-black">Транзакции</p>
+          <router-link
+            class="inline-block rounded-lg bg-white px-5 py-3 text-sm font-medium transition hover:text-gray-500"
+            :to="`/profile/wallet/create-transaction?id=${id}`"
+          >
+            Создать транзакцию
+          </router-link>
 
           <!-- Фильтр -->
           <div class="flex items-center justify-end text-right gap-4 mx-auto">
@@ -232,9 +245,9 @@ onMounted(async () => {
               <!-- Кнопка для открытия выпадающего списка -->
               <button
                 @click="dropdownOpen = !dropdownOpen"
-                class="inline-block rounded-lg bg-yellow-300 px-5 py-3 text-sm font-medium transition hover:bg-yellow-400"
+                class="inline-block rounded-lg bg-yellow-300 px-5 py-3 mr-4 text-sm font-medium transition hover:bg-yellow-400"
               >
-                Выберите категории
+                Категории
               </button>
 
               <!-- Выпадающий список -->
@@ -258,13 +271,11 @@ onMounted(async () => {
               </div>
             </div>
 
-            <!-- class="h-12 rounded-lg p-4 pe-12 text-sm shadow-sm transition hover:bg-white/50" -->
-
             <input
               class="inline-block rounded-lg px-5 py-3 text-sm font-medium transition hover:bg-white/100"
               type="text"
               v-model="dates"
-              placeholder="Введите дату"
+              placeholder="Дата"
             />
           </div>
         </div>
@@ -288,5 +299,3 @@ onMounted(async () => {
     </div>
   </div>
 </template>
-
-<style></style>
