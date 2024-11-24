@@ -67,6 +67,7 @@ export default {
               type="text"
               class="w-full rounded-lg border-gray-200 bg-gray-100 p-4 pe-12 text-sm shadow-sm transition hover:bg-gray-200"
               placeholder="Введите название кошелька"
+              maxlength="30"
               required
             />
           </div>
