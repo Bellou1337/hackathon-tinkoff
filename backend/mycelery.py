@@ -36,8 +36,8 @@ app.conf.broker_connection_retry_on_startup = True
 
 @app.task(name='mycelery.prompt_sender')
 def prompt_sender(prompt: str, key):
-        MAX_ITER_COUNT = 2
-        MAX_DELAY = 1
+        MAX_ITER_COUNT = 50
+        MAX_DELAY = 10
 
         for _ in range(MAX_ITER_COUNT):
             try:

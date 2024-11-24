@@ -268,7 +268,7 @@ async def get_wallet_by_user_id(wallet_data: UserWalletId, session: AsyncSession
 
     return res
 
-@wallet_router.post(
+@wallet_router.get(
     "/get_my",
     responses={
         200: {"model": List[ReadWallet], "description": "Successfully retrieved wallet"},
