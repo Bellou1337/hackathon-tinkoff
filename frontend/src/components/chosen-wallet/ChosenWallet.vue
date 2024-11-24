@@ -157,7 +157,7 @@ const filter = computed(() => {
 </script>
 
 <template>
-  <div class="md:my-32 my-8 max-w-screen-xl mx-auto flex flex-col justify-center px-4">
+  <div class="md:my-32 my-8 max-w-screen-xl mx-auto flex flex-col justify-center px-4 ">
     <h1 class="text-center text-5xl font-bold text-slight-black md:mb-20 mb-8">Имя кошелька</h1>
 
     <div class="flex md:flex-row flex-col mb-8">

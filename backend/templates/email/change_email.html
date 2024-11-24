@@ -1,5 +1,67 @@
-<div>
-    <h1>Смена почты {{ username }}</h1>
-    {{ token }}
-    <br>
-</div>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Template</title>
+</head>
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f6f7f8;
+    padding: 3rem;
+  }
+  h1{
+      text-align: center;
+			margin-bottom: 5rem;
+  }
+  p{
+      text-align: center;
+      margin:1rem 0rem;
+  }
+  a{
+    	display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      padding: 1rem 2rem;
+			color:black
+  }
+  .button{
+      background-color:#ffe044 ;
+      border: none;
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+      padding: 1rem 2rem;
+  }
+  .button:hover{
+      background-color:#e3c325 ;
+  }
+  .centering{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+  }
+</style>
+<body>
+    <div>
+        <h1>Смена почты {{ username }}</h1>
+        <p>Мы отправили это письмо, так как запросили смену почты. Нажмите на ссылку ниже, чтобы 
+            изменить почту.
+        </p>
+        <hr>
+        <div class="centering">
+             <a class="button" ><b>Перейти</b></a>
+        </div>
+        <p>Или пройдите по ссылке:</p>
+        <a href="#">Перейти.</a>
+        <hr>
+        <p>Если вы не запрашивали смену почты, то просто проигнорируйте это сообщение и ваша почта не будет изменена.
+        </p>
+       
+    </div>
+</body>
+</html>

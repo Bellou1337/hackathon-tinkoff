@@ -37,7 +37,7 @@ const wallets = ref([
 </script>
 
 <template>
-  <div class="mt-10 flex flex-col items-center gap-5">
+  <div class="mt-10 flex flex-col items-center gap-5 min-h-[calc(100vh-80px)]">
     <p class="text-3xl font-bold text-slight-black">Текущие кошельки</p>
     <div class="rounded-lg max-h-96 w-full pl-4 overflow-y-auto flex flex-col mb-2 scrollbar">
       <div

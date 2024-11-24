@@ -1,32 +1,32 @@
 <script setup>
-import Wallet from '@/components/Support/WalletInSupport.vue';
-import {ref} from 'vue'
+import Wallet from  '@/components/Support/WalletInSupport.vue' ;
+import {ref} from  'vue' 
 
 const transactions = ref([
     {
         name:"wwwww",
-        amount: '10100',
+        amount:  10100 ,
         currency: "руб.",
     },
     {
         name:"wwwww",
-        amount: '10200',
+        amount:  10200 ,
         currency: "руб.",
     },{
         name:"wwwww",
-        amount: '10300',
+        amount:  10300 ,
         currency: "руб.",
     },{
         name:"wwwww",
-        amount: '10400',
+        amount:  10400 ,
         currency: "руб.",
     },{
         name:"wwwww",
-        amount: '10500',
+        amount:  10500 ,
         currency: "руб.",
     },{
         name:"wwwww",
-        amount: '10600',
+        amount:  10600 ,
         currency: "руб.",
     },
 ])
@@ -34,7 +34,7 @@ const transactions = ref([
 </script>
 
 <template>
-        <div class=" bg-slight-gray gap-10 lg:my-32 my-8 max-w-screen-xl mx-auto flex lg:flex-row flex-col justify-center px-4">
+        <div class="min-h-[calc(100vh-80px)] bg-slight-gray gap-10 lg:my-32 my-8 max-w-screen-xl mx-auto flex lg:flex-row flex-col justify-center px-4">
         <div class="lg:w-1/3">
                 <div>
                     <p class="text-3xl font-bold text-slight-black text-center mb-10">Текущие кошельки</p>
