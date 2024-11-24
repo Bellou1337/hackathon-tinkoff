@@ -74,6 +74,12 @@ const chartOptions = {
 const categories = ref([])
 const transactions = ref([])
 
+const handleTransactionDeleted = (transactionId) => {
+  transactions.value = transactions.value.filter((transaction) => transaction.id !== transactionId)
+  fetchTransactions()
+  fetchWallet()
+}
+
 const fetchCategories = async () => {
   try {
     const token = await getCookie('auth_token')
@@ -303,6 +309,8 @@ onMounted(async () => {
               :amount="transaction.amount"
               :currency="transaction.currency"
               :date="transaction.date"
+              :id="transaction.id"
+              @transactionDeleted="handleTransactionDeleted"
             />
           </div>
         </div>
