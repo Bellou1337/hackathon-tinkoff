@@ -50,7 +50,7 @@ export default {
 </script>
 
 <template>
-  <section class="relative flex items-center justify-center min-h-screen px-4">
+  <section class="relative flex items-center justify-center min-h-[calc(100vh-80px)] px-4 ">
     <div
       class="max-w-screen-sm mx-auto w-full bg-white rounded-2xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-24"
     >
