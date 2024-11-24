@@ -189,9 +189,8 @@ const fetchWallet = async () => {
     console.log(err)
   }
 }
-
 const fetchPDF = async () => {
-  if (timeDo.value !== '' && timeOt.value !== '') {
+  if (timeDo.value != '' && timeOt.value != '') {
     try {
       const token = await getCookie('auth_token')
 
@@ -206,6 +205,7 @@ const fetchPDF = async () => {
           start: timeOt.value,
           end: timeDo.value,
         },
+
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -215,11 +215,12 @@ const fetchPDF = async () => {
       )
 
       if (response.status === 200) {
-        const blob = response.data
+        const blob = response.data // Ответ теперь уже Blob
         const url = URL.createObjectURL(blob)
         const link = document.createElement('a')
         link.href = url
 
+        // Извлекаем имя файла из заголовков, если возможно
         const contentDisposition = response.headers['content-disposition']
         const fileName = contentDisposition
           ? contentDisposition.split('filename=')[1].replace(/"/g, '')
@@ -280,7 +281,7 @@ const setShared = async () => {
       '/wallet/update',
       {
         id: walletId.value,
-        is_shared: true,
+        is_shared: false,
       },
       {
         headers: {
@@ -290,7 +291,7 @@ const setShared = async () => {
     )
 
     if (response.status === 200) {
-      router.push(`/profile/shared?id=${walletId.value}`)
+      router.push(`/profile/wallet?id=${walletId.value}`)
     }
   } catch (err) {
     console.log(err)
@@ -313,7 +314,7 @@ onMounted(async () => {
           @click="setShared"
           class="inline-block rounded-lg text-white bg-blue-500 px-5 py-3 mr-4 text-sm font-medium transition hover:bg-blue-600"
         >
-          Поделиться кошельком
+          Сделать кошелек приватным
         </button>
       </div>
     </div>
@@ -351,13 +352,7 @@ onMounted(async () => {
       <!-- Транзакции -->
       <div class="lg:w-1/2 w-full">
         <div class="flex flex-col items-center gap-5">
-          <p class="text-3xl font-bold text-slight-black">Транзакции</p>
-          <router-link
-            class="inline-block rounded-lg bg-white px-5 py-3 text-sm font-medium transition hover:text-gray-500"
-            :to="`/profile/wallet/create-transaction?id=${id}`"
-          >
-            Создать транзакцию
-          </router-link>
+          <p class="text-3xl font-bold text-slight-black">Общие транзакции</p>
 
           <!-- Фильтр -->
           <div class="flex items-center justify-end text-right gap-4 mx-auto">

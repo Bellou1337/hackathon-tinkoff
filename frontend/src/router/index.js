@@ -9,6 +9,7 @@ import Profile from '@/components/profile/ProfileView.vue'
 import CreateWallet from '@/components/profile/information/wallets/CreateWallet.vue'
 import Support from '@/components/support/Supporter.vue'
 import CreateTransaction from '@/components/chosen-wallet/CreateTransaction.vue'
+import SharedWallet from '@/components/chosen-wallet/SharedWallet.vue'
 
 const routes = [
   { path: '/', component: Home },
@@ -16,6 +17,7 @@ const routes = [
   { path: '/auth/register', component: Register },
   { path: '/auth/verify', component: Verify },
   { path: '/profile/wallet', component: Wallet },
+  { path: '/profile/shared', component: SharedWallet },
   { path: '/profile', component: Profile },
   { path: '/profile/create-wallet', component: CreateWallet },
   { path: '/support', component: Support },
