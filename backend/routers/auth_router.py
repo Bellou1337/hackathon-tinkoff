@@ -72,19 +72,22 @@ def create_token(data: dict, expires_delta: timedelta | None = None):
         },
     }
 )
-async def set_new_email(request : Request, new_email: str = Body(embed=True, examples=["user@example.com"]), user_info = Depends(current_user)):
+async def set_new_email(request : Request, new_email: str = Body(embed=True, examples=["user@example.com"]), user_info = Depends(current_user), session: AsyncSession = Depends(get_async_session)):
     if len(new_email) < 6 or len(new_email) > 255:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=EMAIL_LENGTH_IS_INVALID
         )
     
-    if new_email == user_info.email:
+    stmt = select(user.c.email).where(user.c.email == new_email)
+    data = (await session.execute(stmt)).first()
+
+    if data is not None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=THIS_EMAIL_IS_ALREADY_IN_USE
         )
-    
+
     token = create_token(
         {
             "sub": user_info.id,
