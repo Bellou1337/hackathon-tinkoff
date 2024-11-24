@@ -214,7 +214,11 @@ onMounted(async () => {
 
 <template>
   <div class="md:my-32 my-8 max-w-screen-xl mx-auto flex flex-col justify-center px-4">
-    <h1 class="text-center text-5xl font-bold text-slight-black md:mb-20 mb-8">{{ walletName }}</h1>
+    <div class="overflow-x-auto md:mb-20 mb-8 ">
+      <div class="w-full  ">
+        <h1 class="text-center text-5xl font-bold text-slight-black">{{ walletName }}</h1>
+      </div>
+    </div>
 
     <div class="flex md:flex-row flex-col mb-8">
       <div class="md:w-1/2 w-full mb-8">

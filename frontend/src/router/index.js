@@ -9,6 +9,7 @@ import Profile from '@/components/profile/ProfileView.vue'
 import CreateWallet from '@/components/profile/information/wallets/CreateWallet.vue'
 import Support from '@/components/support/Supporter.vue'
 import CreateTransaction from '@/components/chosen-wallet/CreateTransaction.vue'
+import ChangeTransaction from '@/components/chosen-wallet/ChangeTransaction.vue'
 
 const routes = [
   { path: '/', component: Home },
@@ -20,6 +21,7 @@ const routes = [
   { path: '/profile/create-wallet', component: CreateWallet },
   { path: '/support', component: Support },
   { path: '/profile/wallet/create-transaction', component: CreateTransaction },
+  {path:'/profile/wallet/changeTransaction',component: ChangeTransaction}
 ]
 
 const router = createRouter({

@@ -28,7 +28,13 @@ const handleClick = () => {
   >
     <div class="flex items-center justify-between">
       <div class="flex flex-col justify-center">
-        <h3 class="text-xl font-bold text-gray-900">{{ name }}</h3>
+
+        <div class="w-36 overflow-x-auto">
+          <div>
+            <h3 class="text-xl font-bold text-gray-900">{{ name }}</h3>
+          </div>
+        </div>
+
         <p class="mt-1 text-gray-500">
           <span class="font-semibold">Баланс</span> {{ amount }} {{ currency }}
         </p>

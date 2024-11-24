@@ -159,7 +159,7 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <div class="lg:w-2/3 w-full md:gap-10 sm:gap-2 gap-10 flex sm:flex-row flex-col">
-      <div class="lg:w-1/2 sm:order-1 order-2">
+      <div class="lg:w-1/2 sm:w-2/3  h-2/3 sm:order-1 order-2">
         <p class="text-3xl font-bold text-slight-black text-center mb-10">Советы от Лисёнка</p>
         <div class="bg-gray-200 shadow h-full rounded overflow-y-auto scrollbar max-h-96">
           <p class="text-base text-slight-black sm:p-5 p-2">
@@ -170,10 +170,10 @@ onBeforeUnmount(() => {
           </p>
         </div>
       </div>
-      <div class="lg:w-1/2 sm:w-full sm:order-2 order-1 flex flex-col">
+      <div class="lg:w-1/2 sm:w-1/3 sm:h-full h-1/3 sm:order-2 order-1 flex flex-col">
         <p class="text-3xl font-bold text-slight-black text-center mb-10">Дата и время</p>
         <div
-          class="bg-gray-200 p-2 sm:p-10 h-96 rounded shadow flex flex-col gap-5 items-center justify-center"
+          class="bg-gray-200 p-2 sm:p-10 rounded shadow flex flex-col gap-5 items-center justify-center"
         >
           <div class="bg-gray-300 shadow-lg h-full rounded p-1 sm:p-5">
             <p class="font-bold mb-2 text-center text-lg">От...</p>

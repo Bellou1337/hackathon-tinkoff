@@ -7,20 +7,23 @@ defineProps({
 })
 </script>
 
+
 <template>
   <div
     class="flex w-full min-h-20 max-h-44 h-auto bg-white hover:bg-white/50 rounded-xl px-5 shadow-xl justify-between items-center"
   >
     <div class="w-1/3">
-      <div class=" overflow-x-auto">
-        <div>
-          <p class="text-xl font-bold text-slight-black">{{ name }}</p>
+        <div class="overflow-x-auto">
+          <div>
+            <p class="text-xl font-bold text-slight-black">{{ name }}</p>
+          </div>
         </div>
-      </div>
       
       <p class="inline-block mt-1 text-gray-500">{{ date }}</p>
     </div>
-    <p class="w-1/3 text-lg md:text-3xl font-bold text-slight-black">{{ amount }} {{ currency }}</p>
+    <div class="w-1/3 flex flex-col items-center justify-center text-center">
+      <p class="text-lg md:text-3xl font-bold text-slight-black">{{ amount }} {{ currency }}</p>
+    </div>
     
     <div class="flex flex-col gap-2 items-center justify-center">
       <button
