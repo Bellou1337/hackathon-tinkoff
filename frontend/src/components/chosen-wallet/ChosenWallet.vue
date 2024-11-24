@@ -9,9 +9,12 @@ import { getCookie } from '@/utils/cookies'
 const dropdownOpen = ref(false)
 const dates = ref('')
 const walletName = ref('')
+const walletId = ref('')
 const walletBalance = ref(0)
 const incomes = ref(0)
 const expenses = ref(0)
+const timeOt = ref('')
+const timeDo = ref('')
 
 const route = useRoute()
 const id = route.query.id
@@ -173,11 +176,61 @@ const fetchWallet = async () => {
     if (response.status === 200) {
       walletName.value = response.data.name
       walletBalance.value = response.data.balance
+      walletId.value = response.data.id
     }
   } catch (err) {
     console.log(err)
   }
 }
+const fetchPDF = async ()=>{
+  if(timeDo.value!='' && timeOt.value!=''){
+    try {  
+    const token = await getCookie('auth_token')
+
+    if (!token) {
+      throw new Error('Token not found')
+    }
+
+    const response = await apiClient.post(
+      '/wallet/pdf_generate',
+      {
+        wallet_id: walletId.value,
+        start:timeOt.value ,
+        end:timeDo.value,
+      },
+
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: 'blob',
+      }
+    )
+
+    if (response.status === 200) {
+      const blob = response.data; // Ответ теперь уже Blob
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+
+      // Извлекаем имя файла из заголовков, если возможно
+      const contentDisposition = response.headers['content-disposition'];
+      const fileName = contentDisposition
+        ? contentDisposition.split('filename=')[1].replace(/"/g, '')
+        : 'filename.pdf';
+
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+  } catch (err) {
+    console.log(err)
+  }
+  }
+}
+
 
 const filter = computed(() => {
   const filterArray = []
@@ -194,12 +247,11 @@ const filter = computed(() => {
   })
 
   return filterArray.sort((a, b) => {
-    // Преобразуем строки в объекты Date для правильного сравнения
-    const dateA = new Date(a.date.split('.').reverse().join('-')) // Преобразуем 'DD.MM.YYYY' в 'YYYY-MM-DD'
-    const dateB = new Date(b.date.split('.').reverse().join('-')) // Преобразуем 'DD.MM.YYYY' в 'YYYY-MM-DD'
+    const dateA = new Date(a.date.split('.').reverse().join('-')) 
+    const dateB = new Date(b.date.split('.').reverse().join('-'))
 
-    // Сортировка от самых новых к старым (если требуется сортировка по убыванию)
-    return dateB - dateA // Возвращаем разницу между датами
+   
+    return dateB - dateA 
   })
 })
 
@@ -227,20 +279,33 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div class="flex md:flex-row flex-col mb-8">
-      <div class="md:w-1/2 w-full mb-8">
-        <div class="flex items-center md:justify-start justify-center lg:gap-10 gap-5">
+    <div class="flex lg:flex-row flex-col mb-8">
+      <div class="lg:w-1/2 w-full mb-8">
+        <div class="flex items-center lg:justify-start justify-center lg:gap-10 gap-5">
           <div
-            class="flex flex-col items-center justify-center bg-white my-2 shadow-xl lg:gap-10 gap-5 rounded-lg p-5"
+            class="flex flex-col items-center justify-center bg-white my-2 shadow-xl lg:gap-10 gap-3 rounded-lg p-5"
           >
             <Graph :data="chartData" :options="chartOptions" />
             <p class="text-3xl font-bold text-slight-black">{{ walletBalance }} руб.</p>
+            <div class="flex items-center justify-center gap-3">
+              <div class="w-full flex flex-col items-center justify-center">
+                <p class=" text-lg font-bold text-slight-black">От</p>
+                <input v-model="timeOt" class="w-5 bg-slight-gray rounded shadow" type="date">
+              </div>
+              
+              <button @click="fetchPDF" class="text-center w-full text-xl rounded underline font-bold text-slight-black" > Скачать PDF </button>
+              
+              <div class="w-full flex flex-col items-center justify-center">
+                <p class=" text-lg font-bold text-slight-black">До</p>
+                <input v-model="timeDo" class="w-5 bg-slight-gray rounded shadow" type="date">
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Транзакции -->
-      <div class="md:w-1/2 w-full">
+      <div class="lg:w-1/2 w-full">
         <div class="flex flex-col items-center gap-5">
           <p class="text-3xl font-bold text-slight-black">Транзакции</p>
           <router-link
