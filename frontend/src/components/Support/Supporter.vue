@@ -163,7 +163,7 @@ onBeforeUnmount(() => {
         <p class="text-3xl font-bold text-slight-black text-center mb-10">Советы от Лисёнка</p>
         <div class="bg-gray-200 shadow h-full rounded overflow-y-auto scrollbar max-h-96">
           <p class="text-base text-slight-black sm:p-5 p-2">
-            Нажмите на кнопку анализ, чтобы получить совет
+            Выберите промежуток времени для анализа и нажмите на кнопку "анализ", чтобы получить совет.
           </p>
           <p v-if="recommendation" class="text-base text-slight-black sm:p-5 p-2">
             {{ recommendation }}
