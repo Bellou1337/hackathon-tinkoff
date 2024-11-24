@@ -193,7 +193,14 @@ const filter = computed(() => {
     }
   })
 
-  return filterArray
+  return filterArray.sort((a, b) => {
+    // Преобразуем строки в объекты Date для правильного сравнения
+    const dateA = new Date(a.date.split('.').reverse().join('-')) // Преобразуем 'DD.MM.YYYY' в 'YYYY-MM-DD'
+    const dateB = new Date(b.date.split('.').reverse().join('-')) // Преобразуем 'DD.MM.YYYY' в 'YYYY-MM-DD'
+
+    // Сортировка от самых новых к старым (если требуется сортировка по убыванию)
+    return dateB - dateA // Возвращаем разницу между датами
+  })
 })
 
 const convertDate = (isoDate) => {
