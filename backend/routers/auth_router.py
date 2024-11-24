@@ -66,7 +66,7 @@ def create_token(data: dict, expires_delta: timedelta | None = None):
         400: {
             "content": {
                 "application/json": {
-                    "example": {"detail": "error name"}
+                    "example": {"detail": "ERROR NAME"}
                 }
             }
         },
@@ -123,7 +123,14 @@ async def set_new_email(request : Request, new_email: str = Body(embed=True, exa
         400: {
             "content": {
                 "application/json": {
-                    "example": {"detail": "error name"}
+                    "example": {"detail": "ERROR NAME"}
+                }
+            }
+        },
+        404: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": USER_NOT_FOUND}
                 }
             }
         },
@@ -165,9 +172,4 @@ async def set_new_email(token: str = Body(embed=True), session: AsyncSession = D
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=USER_NOT_FOUND
-        )
-    except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=SERVER_ERROR_SOMETHING_WITH_THE_DATA
         )

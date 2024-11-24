@@ -66,15 +66,20 @@ async def check_can_read_wallet(wallet_id: int, user_id, session: AsyncSession) 
     responses={
         200: {"model": ResponseDetail, "description": "Successfully created wallet"},
         400: {
-            "description": "Bad Request",
             "content": {
                 "application/json": {
-                    "example": {"detail": CATEGORY_NOT_FOUND}
+                    "example": {"detail": CATEGORY_OR_TRANSACTION_NOT_FOUND}
+                }
+            }
+        },
+        403: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": USER_PERMISSION_ERROR}
                 }
             }
         },
         500: {
-            "description": "Internal Server Error",
             "content": {
                 "application/json": {
                     "example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}
@@ -114,10 +119,16 @@ async def add_new_wallet(
     responses={
         200: {"model": ResponseDetail, "description": "Successfully created wallet"},
         400: {
-            "description": "Bad Request",
             "content": {
                 "application/json": {
-                    "example": {"detail": CATEGORY_NOT_FOUND}
+                    "example": {"detail": CATEGORY_OR_TRANSACTION_NOT_FOUND}
+                }
+            }
+        },
+        403: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": USER_PERMISSION_ERROR}
                 }
             }
         },
@@ -164,7 +175,20 @@ async def add_new_wallet_by_user_id(
     "/remove",
     responses={
         200: {"model": ResponseDetail, "description": "Successfully removed wallet"},
-        404: {"description": "Not Found", "content": {"application/json": {"example": {"detail": WALLET_NOT_FOUND}}},},
+        403: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": USER_PERMISSION_ERROR}
+                }
+            }
+        },
+        404: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": WALLET_NOT_FOUND}
+                }
+            }
+        },
         500: {"description": "Internal Server Error", "content": {"application/json": {"example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}}}}
     }
 )
@@ -193,6 +217,20 @@ async def remove_wallet(wallet_data: RemoveWallet,session: AsyncSession = Depend
     "/update",
     responses={
         200: {"model": ResponseDetail, "description": "Successfully updated wallet"},
+        400: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": INVALID_USER_ID_PROVIDED}
+                }
+            }
+        },
+        403: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": USER_PERMISSION_ERROR}
+                }
+            }
+        },
         404: {"description": "Not Found", "content": {"application/json": {"example": {"detail": WALLET_NOT_FOUND}}}},
         500: {"description": "Internal Server Error", "content": {"application/json": {"example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}}}}
     }
@@ -237,6 +275,13 @@ async def update_wallet(wallet_data: UpdateWallet,session: AsyncSession = Depend
     "/get_by_user_id",
     responses={
         200: {"model": List[ReadWallet], "description": "Successfully retrieved wallet"},
+        403: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": USER_PERMISSION_ERROR}
+                }
+            }
+        },
         404: {"description": "Not Found", "content": {"application/json": {"example": {"detail": WALLET_NOT_FOUND}}}},
         500: {"description": "Internal Server Error", "content": {"application/json": {"example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}}}}
     }
@@ -272,6 +317,13 @@ async def get_wallet_by_user_id(wallet_data: UserWalletId, session: AsyncSession
     "/get_my",
     responses={
         200: {"model": List[ReadWallet], "description": "Successfully retrieved wallet"},
+        403: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": USER_PERMISSION_ERROR}
+                }
+            }
+        },
         404: {"description": "Not Found", "content": {"application/json": {"example": {"detail": WALLET_NOT_FOUND}}}},
         500: {"description": "Internal Server Error", "content": {"application/json": {"example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}}}}
     }
@@ -301,6 +353,13 @@ async def get_wallet_my(user: UserRead = Depends(current_user), session: AsyncSe
     "/get_by_id",
     responses={
         200: {"model": ReadWallet, "description": "Successfully retrieved wallet"},
+        403: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": USER_PERMISSION_ERROR}
+                }
+            }
+        },
         404: {"description": "Not Found", "content": {"application/json": {"example": {"detail": WALLET_NOT_FOUND}}}},
         500: {"description": "Internal Server Error", "content": {"application/json": {"example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}}}}
     }
@@ -331,6 +390,13 @@ async def get_wallet_by_id(wallet_data: WhalletId, session: AsyncSession = Depen
     "/pdf_generate",
     responses={
         200: {"model": ReadWallet, "description": "Successfully retrieved wallet"},
+        403: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": USER_PERMISSION_ERROR}
+                }
+            }
+        },
         404: {"description": "Not Found", "content": {"application/json": {"example": {"detail": WALLET_NOT_FOUND}}}},
         500: {"description": "Internal Server Error", "content": {"application/json": {"example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}}}}
     }

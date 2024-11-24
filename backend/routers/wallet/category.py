@@ -20,15 +20,20 @@ category_router = APIRouter(
     responses={
         200: {"model": NewCategory, "description": "Successfully created category"},
         400: {
-            "description": "Bad Request",
             "content": {
                 "application/json": {
                     "example": {"detail": CATEGORY_ALREADY_EXISTS}
                 }
             }
         },
+        403: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": USER_PERMISSION_ERROR}
+                }
+            }
+        },
         500: {
-            "description": "Internal Server Error",
             "content": {
                 "application/json": {
                     "example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}
@@ -43,39 +48,27 @@ async def set_new_category(
         user: UserRead = Depends(current_superuser)
     ):
     
-    try:
-        stmt = select(category).where(category.c.name == category_data.name)
-        
-        result = await session.execute(stmt)
-        
-        if result.first():
-            raise HTTPException(
-                status_code= status.HTTP_400_BAD_REQUEST,
-                detail=CATEGORY_ALREADY_EXISTS,
-                
-            )
-        
-        
-        query = insert(category).values(
-            name = category_data.name,
-            is_income = category_data.is_income
-        )
-        
-        await session.execute(query)
-        await session.commit()
-        
-        return category_data
+    stmt = select(category).where(category.c.name == category_data.name)
     
-    except HTTPException:
+    result = await session.execute(stmt)
+    
+    if result.first():
         raise HTTPException(
-            status_code = status.HTTP_400_BAD_REQUEST,
-            detail = CATEGORY_ALREADY_EXISTS
+            status_code= status.HTTP_400_BAD_REQUEST,
+            detail=CATEGORY_ALREADY_EXISTS,
+            
         )
-    except Exception:
-        raise HTTPException(
-            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail = SERVER_ERROR_SOMETHING_WITH_THE_DATA
-        )
+    
+    
+    query = insert(category).values(
+        name = category_data.name,
+        is_income = category_data.is_income
+    )
+    
+    await session.execute(query)
+    await session.commit()
+    
+    return category_data
 
 
 
@@ -83,16 +76,14 @@ async def set_new_category(
     "/delete",
     responses={
         200: {"model": ResponseDetail,"detail": OK},
-        400: {
-            "description": "Bad Request",
+        403: {
             "content": {
                 "application/json": {
-                    "example": {"detail": CATEGORY_NOT_FOUND}
+                    "example": {"detail": USER_PERMISSION_ERROR}
                 }
             }
         },
         500: {
-            "description": "Internal Server Error",
             "content": {
                 "application/json": {
                     "example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}
@@ -106,20 +97,13 @@ async def remove_category(
         session: AsyncSession = Depends(get_async_session),
         user: UserRead = Depends(current_superuser)
     ): 
+
+    query = delete(category).where(category.c.id == category_id)
     
-    try:        
-        query = delete(category).where(category.c.id == category_id)
-        
-        await session.execute(query)
-        await session.commit()
-        
-        return {"detail" : OK}
+    await session.execute(query)
+    await session.commit()
     
-    except Exception:
-        raise HTTPException(
-            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail = SERVER_ERROR_SOMETHING_WITH_THE_DATA
-        )
+    return {"detail" : OK}
 
 
 @category_router.post(
@@ -127,10 +111,16 @@ async def remove_category(
     responses={
         200: {"model": ReadCategory},
         404: {
-            "description": "Bad Request",
             "content": {
                 "application/json": {
                     "example": {"detail": CATEGORY_NOT_FOUND}
+                }
+            }
+        },
+        500: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}
                 }
             }
         }
@@ -158,10 +148,16 @@ async def get_category(
     responses={
         200: {"model": list[ReadCategory]},
         404: {
-            "description": "Bad Request",
             "content": {
                 "application/json": {
                     "example": {"detail": CATEGORY_NOT_FOUND}
+                }
+            }
+        },
+        500: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}
                 }
             }
         }
@@ -194,11 +190,17 @@ async def get_category_list(
     "/update",
     responses={
         200: {"model": ResponseDetail, "detail": OK},
-        400: {
-            "description": "Bad Request",
+        403: {
             "content": {
                 "application/json": {
-                    "example": {"detail": CATEGORY_NOT_FOUND}
+                    "example": {"detail": USER_PERMISSION_ERROR}
+                }
+            }
+        },
+        500: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}
                 }
             }
         }
@@ -231,7 +233,6 @@ async def update_category(
     responses={
         200: {"model": List[ReadCategory]},
         404: {
-            "description": "Bad Request",
             "content": {
                 "application/json": {
                     "example": {"detail": CATEGORY_NOT_FOUND}
@@ -239,7 +240,6 @@ async def update_category(
             }
         },
         500: {
-            "description": "Internal Server Error",
             "content": {
                 "application/json": {
                     "example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}

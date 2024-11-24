@@ -21,16 +21,21 @@ transaction_router = APIRouter(
     "/add",
     responses={
         200: {"model": ResponseDetail, "description": "Successfully created transaction"},
-        400: {
-            "description": "Bad Request",
+        403: {
             "content": {
                 "application/json": {
-                    "example": {"detail": CATEGORY_NOT_FOUND}
+                    "example": {"detail": USER_PERMISSION_ERROR}
+                }
+            }
+        },
+        404: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": CATEGORY_OR_TRANSACTION_NOT_FOUND}
                 }
             }
         },
         500: {
-            "description": "Internal Server Error",
             "content": {
                 "application/json": {
                     "example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}
@@ -89,15 +94,20 @@ async def add_new_transaction(
     responses={
         200: {"model": ResponseDetail,"detail": OK},
         400: {
-            "description": "Bad Request",
             "content": {
                 "application/json": {
-                    "example": {"detail": TRANSACTION_NOT_FOUND}
+                    "example": {"detail": CATEGORY_OR_TRANSACTION_NOT_FOUND}
+                }
+            }
+        },
+        403: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": USER_PERMISSION_ERROR}
                 }
             }
         },
         500: {
-            "description": "Internal Server Error",
             "content": {
                 "application/json": {
                     "example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}
@@ -118,7 +128,7 @@ async def remove_transaction(
     if transaction_data is None:
         raise HTTPException(
             status_code = status.HTTP_400_BAD_REQUEST,
-            detail = TRANSACTION_NOT_FOUND
+            detail = CATEGORY_OR_TRANSACTION_NOT_FOUND
         )
     
     if not (await check_ownership_wallet(transaction_data[1], user.id, session)) and not user.is_superuser:
@@ -130,7 +140,7 @@ async def remove_transaction(
     if category_data is None:
         raise HTTPException(
             status_code = status.HTTP_400_BAD_REQUEST,
-            detail = CATEGORY_NOT_FOUND
+            detail = CATEGORY_OR_TRANSACTION_NOT_FOUND
         )
 
     query = delete(transaction).where(transaction.c.id == transaction_id)
@@ -155,8 +165,14 @@ async def remove_transaction(
     "/get_by_date",
     responses={
         200: {"model": list[ReadTransaction]},
+        403: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": USER_PERMISSION_ERROR}
+                }
+            }
+        },
         500: {
-            "description": "Internal Server Error",
             "content": {
                 "application/json": {
                     "example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}
@@ -182,11 +198,24 @@ async def get_transaction_by_date(
     "/get_by_id",
     responses={
         200: {"model": ReadTransaction},
+        403: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": USER_PERMISSION_ERROR}
+                }
+            }
+        },
         404: {
-            "description": "Bad Request",
             "content": {
                 "application/json": {
                     "example": {"detail": TRANSACTION_NOT_FOUND}
+                }
+            }
+        },
+        500: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}
                 }
             }
         }
@@ -204,7 +233,7 @@ async def get_transaction_by_id(
 
     if item is None:
         raise HTTPException(
-            status_code = status.HTTP_400_BAD_REQUEST,
+            status_code = status.HTTP_404_NOT_FOUND,
             detail = TRANSACTION_NOT_FOUND
         )
     
@@ -223,7 +252,21 @@ async def get_transaction_by_id(
 @transaction_router.post(
     "/get_by_wallet_id",
     responses={
-        200: {"model": list[ReadTransaction]}
+        200: {"model": list[ReadTransaction]},
+        403: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": USER_PERMISSION_ERROR}
+                }
+            }
+        },
+        500: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}
+                }
+            }
+        }
     }
 )
 async def get_transaction_by_wallet_id(
@@ -254,7 +297,31 @@ async def get_transaction_by_wallet_id(
     return res
 
 @transaction_router.post(
-    "/update"
+    "/update",
+    responses={
+        200: {"model": ResponseDetail,"detail": OK},
+        404: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": CATEGORY_OR_TRANSACTION_NOT_FOUND}
+                }
+            }
+        },
+        403: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": USER_PERMISSION_ERROR}
+                }
+            }
+        },
+        500: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": SERVER_ERROR_SOMETHING_WITH_THE_DATA}
+                }
+            }
+        }
+    }
 )
 async def update_transaction(
         trasaction_data: UpdateTransaction = Body(embed=True),
@@ -267,8 +334,8 @@ async def update_transaction(
 
     if old_transaction_data is None:
         raise HTTPException(
-            status_code = status.HTTP_400_BAD_REQUEST,
-            detail = TRANSACTION_NOT_FOUND
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = CATEGORY_OR_TRANSACTION_NOT_FOUND
         )
 
     old_amount, old_category_id, wallet_id = old_transaction_data
@@ -283,8 +350,8 @@ async def update_transaction(
 
     if old_category_is_income is None:
         raise HTTPException(
-            status_code = status.HTTP_400_BAD_REQUEST,
-            detail = CATEGORY_NOT_FOUND
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = CATEGORY_OR_TRANSACTION_NOT_FOUND
         )
 
     old_category_is_income = old_category_is_income[0]
@@ -296,8 +363,8 @@ async def update_transaction(
 
         if new_category_is_income is None:
             raise HTTPException(
-                status_code = status.HTTP_400_BAD_REQUEST,
-                detail = CATEGORY_NOT_FOUND
+                status_code = status.HTTP_404_NOT_FOUND,
+                detail = CATEGORY_OR_TRANSACTION_NOT_FOUND
             )
 
         new_category_is_income = new_category_is_income[0]

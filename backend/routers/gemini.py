@@ -22,15 +22,20 @@ transaction_router = APIRouter(
             "description": "Successfully got recommendations"
         },
         404: {
-            "description": "Not Found",
             "content": {
                 "application/json": {
                     "example": {"detail": NO_TRANSACTIONS_FOUND}
                 }
             }
         },
+        403: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": USER_PERMISSION_ERROR}
+                }
+            }
+        },
         500: {
-            "description": "Internal Server Error",
             "content": {
                 "application/json": {
                     "example": {"detail": API_ERROR_SOMETHING_WITH_THE_DATA}
@@ -93,15 +98,20 @@ async def create_recomendation_generate_task(gemini_data: GetTransaction, sessio
             "description": "Successfully got redis key"
         },
         404: {
-            "description": "Not Found",
             "content": {
                 "application/json": {
                     "example": {"detail": NO_KEY}
                 }
             }
         },
+        403: {
+            "content": {
+                "application/json": {
+                    "example": {"detail": USER_PERMISSION_ERROR}
+                }
+            }
+        },
         500: {
-            "description": "Internal Server Error",
             "content": {
                 "application/json": {
                     "example": {"detail": REDIS_ERROR_SOMETHING_WITH_THE_DATA}
