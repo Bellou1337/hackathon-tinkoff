@@ -1,18 +1,49 @@
 <script>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { getCookie } from '@/utils/cookies'
+import apiClient from '@/services'
 
 export default {
   setup() {
     const name = ref('')
 
+    const router = useRouter()
+
     const handleSubmit = async (event) => {
       event.preventDefault()
 
-      // TODO: бэкенд логика
+      try {
+        const token = await getCookie('auth_token')
+
+        if (!token) {
+          throw new Error('Token not found')
+        }
+
+        const response = await apiClient.post(
+          '/wallet/add',
+          {
+            name: name.value,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+
+        if (response.status === 200) {
+          console.log(response.data)
+          router.push('/profile')
+        }
+      } catch (err) {
+        console.log(err)
+      }
     }
 
     return {
       name,
+      handleSubmit,
     }
   },
 }

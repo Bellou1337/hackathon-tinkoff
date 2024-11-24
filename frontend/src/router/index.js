@@ -7,7 +7,7 @@ import Verify from '@/components/auth/Verify.vue'
 import Wallet from '@/components/chosen-wallet/ChosenWallet.vue'
 import Profile from '@/components/profile/ProfileView.vue'
 import CreateWallet from '@/components/profile/information/wallets/CreateWallet.vue'
-import Support from '@/components/Support/Supporter.vue'
+import Support from '@/components/support/Supporter.vue'
 
 const routes = [
   { path: '/', component: Home },
@@ -17,7 +17,7 @@ const routes = [
   { path: '/profile/wallet', component: Wallet },
   { path: '/profile', component: Profile },
   { path: '/profile/create-wallet', component: CreateWallet },
-  {path:'/support', component:Support}
+  { path: '/support', component: Support },
 ]
 
 const router = createRouter({

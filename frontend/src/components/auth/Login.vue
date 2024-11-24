@@ -33,11 +33,11 @@ export default {
       try {
         const token = await getCookie('auth_token')
 
-        if (token) {
-          messageType.value = MessageTypeEnum.LOGIN_FAILED
-          message.value = 'Пользователь уже авторизован'
-          return
-        }
+        // if (token) {
+        //   messageType.value = MessageTypeEnum.LOGIN_FAILED
+        //   message.value = 'Пользователь уже авторизован'
+        //   return
+        // }
 
         const response = await apiClient.post(
           '/auth/jwt/login',
@@ -59,10 +59,8 @@ export default {
           message.value = 'Авторизация прошла успешно!'
           console.log('Авторизация прошла успешно!')
 
-          if (!token) {
-            document.cookie = `auth_token=${response.data.access_token}; path=/;`
-            return
-          }
+          document.cookie = `auth_token=${response.data.access_token}; path=/;`
+          return
         } else {
           messageType.value = MessageTypeEnum.LOGIN_FAILED
           message.value = response.data.message || 'Неверный логин или пароль!'

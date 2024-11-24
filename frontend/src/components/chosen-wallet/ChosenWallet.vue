@@ -1,17 +1,23 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 
 import Transaction from '@/components/chosen-wallet/Transaction.vue'
 import Graph from '@/components/graphs/MoneyGraph.vue'
+import apiClient from '@/services'
+import { getCookie } from '@/utils/cookies'
 
 const dropdownOpen = ref(false)
 const dates = ref('')
+const walletName = ref('')
+
+const route = useRoute()
 
 const chartData = {
-  labels: ['Доходы', 'Расходы'],
+  names: ['Доходы', 'Расходы'],
   datasets: [
     {
-      label: 'Доходы - Расходы',
+      name: 'Доходы - Расходы',
       data: [7000, 3000],
       backgroundColor: ['#facc15', '#313232'],
       hoverBackgroundColor: ['#20d457', '#c44242'],
@@ -29,7 +35,7 @@ const chartOptions = {
     legend: {
       display: true,
       position: 'top',
-      labels: {
+      names: {
         color: '#333333',
         font: {
           family: 'Geologica, sans-serif',
@@ -62,81 +68,106 @@ const chartOptions = {
   },
 }
 
-const transactions = ref([
-  {
-    label: 'wwwww',
-    amount: '-300',
-    currency: 'руб.',
-    date: '01.10.2010',
-  },
-  {
-    label: 'wwwww',
-    amount: '+400',
-    currency: 'руб.',
-    date: '02.10.2010',
-  },
-  {
-    label: 'wwwww',
-    amount: '-500',
-    currency: 'руб.',
-    date: '03.10.2010',
-  },
-  {
-    label: 'wwwww',
-    amount: '-500',
-    currency: 'руб.',
-    date: '04.10.2010',
-  },
-  {
-    label: 'wwwww',
-    amount: '-500',
-    currency: 'руб.',
-    date: '05.10.2010',
-  },
-  {
-    label: 'wwwww',
-    amount: '-500',
-    currency: 'руб.',
-    date: '06.10.2010',
-  },
-  {
-    label: 'wwwww',
-    amount: '-500',
-    currency: 'руб.',
-    date: '07.10.2010',
-  },
-  {
-    label: 'wwwww',
-    amount: '-500',
-    currency: 'руб.',
-    date: '08.10.2010',
-  },
-  {
-    label: 'wwwww',
-    amount: '-500',
-    currency: 'руб.',
-    date: '09.10.2010',
-  },
-  {
-    label: 'wwwww',
-    amount: '-300',
-    currency: 'руб.',
-    date: '10.10.2010',
-  },
-  {
-    label: 'wwwww',
-    amount: '+400',
-    currency: 'руб.',
-    date: '11.10.2010',
-  },
-])
+const categories = ref([])
+const transactions = ref([])
 
-const categories = ref([
-  {
-    flag: true,
-    value: 'wwwww',
-  },
-])
+const fetchCategories = async () => {
+  try {
+    const token = await getCookie('auth_token')
+
+    if (!token) {
+      throw new Error('Token not found')
+    }
+
+    const response = await apiClient.get('/category/get_all', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    if (response.status === 200) {
+      // console.log(response.data)
+
+      categories.value = response.data.map((category) => ({
+        name: category.name,
+        income: category.is_income,
+        active: true,
+        id: category.id,
+      }))
+    }
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+const fetchTransactions = async () => {
+  try {
+    const token = await getCookie('auth_token')
+    const id = route.query.id
+
+    if (!token) {
+      throw new Error('Token not found')
+    }
+
+    const response = await apiClient.post(
+      '/transaction/get_by_wallet_id',
+      {
+        wallet_id: id,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+
+    if (response.status === 200) {
+      // console.log(response.data)
+
+      transactions.value = response.data.map((transaction) => ({
+        name: transaction.title,
+        amount: transaction.amount,
+        currency: 'руб.',
+        date: convertDate(transaction.date),
+        id: transaction.id,
+        category_id: transaction.category_id,
+      }))
+    }
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+const fetchWalletName = async () => {
+  try {
+    const token = await getCookie('auth_token')
+    const id = route.query.id
+
+    if (!token) {
+      throw new Error('Token not found')
+    }
+
+    const response = await apiClient.post(
+      '/wallet/get_by_id',
+      {
+        id: id,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+
+    if (response.status === 200) {
+      console.log(response.data)
+
+      walletName.value = response.data.name
+    }
+  } catch (err) {
+    console.log(err)
+  }
+}
 
 const filter = computed(() => {
   const filterArray = []
@@ -144,7 +175,10 @@ const filter = computed(() => {
   transactions.value.forEach((element) => {
     const dateMatch = element.date.includes(dates.value)
     const categoryMatch = categories.value.some(
-      (category) => category.flag && element.label.includes(category.value)
+      (category) =>
+        category.active &&
+        category.income === category.income &&
+        element.category_id === category.id
     )
 
     if (dateMatch && categoryMatch) {
@@ -154,11 +188,26 @@ const filter = computed(() => {
 
   return filterArray
 })
+
+const convertDate = (isoDate) => {
+  const date = new Date(isoDate)
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+
+  return `${day}.${month}.${year}`
+}
+
+onMounted(async () => {
+  await fetchCategories()
+  await fetchTransactions()
+  await fetchWalletName()
+})
 </script>
 
 <template>
   <div class="md:my-32 my-8 max-w-screen-xl mx-auto flex flex-col justify-center px-4">
-    <h1 class="text-center text-5xl font-bold text-slight-black md:mb-20 mb-8">Имя кошелька</h1>
+    <h1 class="text-center text-5xl font-bold text-slight-black md:mb-20 mb-8">{{ walletName }}</h1>
 
     <div class="flex md:flex-row flex-col mb-8">
       <div class="md:w-1/2 w-full mb-8">
@@ -191,21 +240,21 @@ const filter = computed(() => {
               <!-- Выпадающий список -->
               <div
                 v-show="dropdownOpen"
-                class="absolute mt-2 w-48 bg-white border rounded-lg shadow-lg z-10 p-2"
+                class="absolute mt-2 w-56 bg-white border rounded-lg shadow-lg z-10 p-2"
               >
-                <label
+                <div
                   v-for="(category, index) in categories"
                   :key="index"
                   class="flex items-center space-x-2"
                 >
                   <input
                     type="checkbox"
-                    v-model="category.flag"
-                    :value="category.value"
+                    v-model="category.active"
+                    :value="category.name"
                     class="h-4 w-4 text-green-500 border-gray-300 rounded focus:ring-green-500"
                   />
-                  <span>{{ category.value }}</span>
-                </label>
+                  <span>{{ category.name }}</span>
+                </div>
               </div>
             </div>
 
@@ -226,9 +275,9 @@ const filter = computed(() => {
           >
             <Transaction
               v-for="transaction in filter"
-              key="index"
+              :key="transaction.id"
               class="my-2"
-              :label="transaction.label"
+              :name="transaction.name"
               :amount="transaction.amount"
               :currency="transaction.currency"
               :date="transaction.date"

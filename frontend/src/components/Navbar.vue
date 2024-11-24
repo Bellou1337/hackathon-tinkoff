@@ -11,7 +11,8 @@ export default {
     }
 
     const isLoggedIn = () => {
-      return getCookie('auth_token') !== undefined
+      // return getCookie('auth_token') !== undefined
+      true
     }
 
     return {
@@ -104,7 +105,7 @@ export default {
               >
                 <div class="p-2">
                   <router-link
-                    to="/auth/profile"
+                    to="/profile"
                     class="block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                     role="menuitem"
                   >

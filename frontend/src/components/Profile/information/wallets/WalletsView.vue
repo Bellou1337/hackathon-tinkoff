@@ -1,39 +1,43 @@
 <script setup>
 import Wallet from '@/components/profile/information/wallets/Wallet.vue'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { getCookie } from '@/utils/cookies'
+import apiClient from '@/services'
 
-const wallets = ref([
-  {
-    name: 'первый',
-    amount: 1000,
-    currency: 'руб.',
-  },
-  {
-    name: 'второй',
-    amount: 1000,
-    currency: 'руб.',
-  },
-  {
-    name: 'третий',
-    amount: 1000,
-    currency: 'руб.',
-  },
-  {
-    name: 'четвертый',
-    amount: 1000,
-    currency: 'руб.',
-  },
-  {
-    name: 'пятый',
-    amount: 1000,
-    currency: 'руб.',
-  },
-  {
-    name: 'шестой',
-    amount: 1000,
-    currency: 'руб.',
-  },
-])
+const wallets = ref([])
+
+const fetchWallets = async () => {
+  try {
+    const token = await getCookie('auth_token')
+
+    if (!token) {
+      throw new Error('Token not found')
+    }
+
+    const response = await apiClient.get('/wallet/get_my', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    if (response.status === 200) {
+      console.log(response.data)
+
+      wallets.value = response.data.map((wallet) => ({
+        name: wallet.name,
+        balance: 0,
+        id: wallet.id,
+        currency: 'руб.',
+      }))
+    }
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+onMounted(() => {
+  fetchWallets()
+})
 </script>
 
 <template>
@@ -48,7 +52,8 @@ const wallets = ref([
           key="index"
           class="my-2"
           :name="wallet.name"
-          :amount="wallet.amount"
+          :id="wallet.id"
+          :amount="wallet.balance"
           :currency="wallet.currency"
         />
       </div>
