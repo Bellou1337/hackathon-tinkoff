@@ -111,6 +111,7 @@ export default {
               >
                 <div class="p-2">
                   <router-link
+                    @click="toggleDropdown"
                     to="/profile"
                     class="block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                     role="menuitem"
@@ -119,6 +120,7 @@ export default {
                   </router-link>
 
                   <router-link
+                    @click="toggleDropdown"
                     to="/"
                     class="block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                     role="menuitem"
@@ -127,6 +129,7 @@ export default {
                   </router-link>
 
                   <router-link
+                    @click="toggleDropdown"
                     v-if="!loggedIn"
                     to="/auth/login"
                     class="block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
