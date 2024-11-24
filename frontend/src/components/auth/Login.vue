@@ -35,7 +35,7 @@ export default {
 
         if (token) {
           messageType.value = MessageTypeEnum.LOGIN_FAILED
-          message.value = response.data.message || 'Пользователь уже авторизован'
+          message.value = 'Пользователь уже авторизован'
           return
         }
 
@@ -60,7 +60,7 @@ export default {
           console.log('Авторизация прошла успешно!')
 
           if (!token) {
-            document.cookie = `auth_token=${response.data.token}; path=/;`
+            document.cookie = `auth_token=${response.data.access_token}; path=/;`
             return
           }
         } else {

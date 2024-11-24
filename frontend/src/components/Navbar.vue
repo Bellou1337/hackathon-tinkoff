@@ -11,8 +11,7 @@ export default {
     }
 
     const isLoggedIn = () => {
-      // return getCookie('auth_token') !== undefined
-      return false
+      return getCookie('auth_token') !== undefined
     }
 
     return {
@@ -64,6 +63,7 @@ export default {
             </router-link>
 
             <router-link
+              v-if="!isLoggedIn()"
               class="block rounded-md bg-yellow-300 px-5 py-2.5 text-sm font-medium text-slight-black transition hover:bg-yellow-400"
               to="/auth/login"
             >
@@ -104,7 +104,7 @@ export default {
               >
                 <div class="p-2">
                   <router-link
-                    to="/auth/login"
+                    to="/auth/profile"
                     class="block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                     role="menuitem"
                   >
@@ -112,7 +112,7 @@ export default {
                   </router-link>
 
                   <router-link
-                    to="/auth/login"
+                    to="/"
                     class="block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                     role="menuitem"
                   >

@@ -1,14 +1,48 @@
 <script>
-import { ref } from 'vue'
-
+import { ref, onMounted, watch } from 'vue'
+import apiClient from '@/services'
+import { getCookie } from '@/utils/cookies'
 export default {
   setup() {
     const name = ref('user')
     const email = ref('user@example.com')
+    const isLoading = ref(true)
+    const error = ref(null)
+
+    const fetchUserInfo = async () => {
+      try {
+        const token = await getCookie('auth_token')
+
+        if (!token) {
+          throw new Error('Token not found')
+        }
+
+        const response = await apiClient.get('/auth/users/me', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (response.status === 200) {
+          name.value = response.data.username
+          email.value = response.data.email
+          isLoading.value = false
+        }
+      } catch (err) {
+        error.value = err.message
+        isLoading.value = false
+      }
+    }
+
+    onMounted(() => {
+      fetchUserInfo()
+    })
 
     return {
       name,
       email,
+      isLoading,
+      error,
     }
   },
 }
