@@ -2,13 +2,13 @@ services:
   web:
     build: .
     ports:
-      - "8000:8000"
+      - ./env
     depends_on:
       - postgres
       - redis
     environment:
-      - DATABASE_URL=postgresql://user:password@postgres:5432/dbname
-      - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=./env
+      - REDIS_URL=./env
     volumes:
       - .:/app
 
@@ -33,12 +33,12 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - ./env
 
   redis:
     image: redis:latest
     ports:
-      - "6379:6379"
+      - ./env
     volumes:
       - redis_data:/data
 
@@ -48,11 +48,11 @@ services:
       dockerfile: Dockerfile.celery
     command: celery -A mycelery flower
     ports:
-      - "5555:5555"
+      - ./env
     depends_on:
       - celery
     environment:
-      - REDIS_URL=redis://redis:6379/0
+      - REDIS_URL=./env
 
 volumes:
   postgres_data:
