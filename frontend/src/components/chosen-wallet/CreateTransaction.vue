@@ -123,7 +123,18 @@ console.error('QR Code Decode Error:', error);
 };
 
 const startScanning = () => {
-isScanning.value = true;
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then((stream) => {
+        console.log("Доступ к камере получен");
+        isScanning.value = true;  // Открытие потока видео
+      })
+      .catch((error) => {
+        console.error("Ошибка доступа к камере:", error);
+      });
+  } else {
+    console.error("Ваш браузер не поддерживает доступ к камере");
+  }
 };
 
 const stopScanning = () => {
